@@ -695,13 +695,13 @@ async function loadScene(scene) {
     pitch: 0,
     yaw: 0,
     hotSpots: buildHotspots(scene),
-    onLoad: () => {
-      showOverlay(false);
-      setQualityBadge('25%');
-      loadMed(scene);
-    },
-    onError: () => { showOverlay(false); }
   });
+  viewer.on('load', () => {
+    showOverlay(false);
+    setQualityBadge('25%');
+    loadMed(scene);
+  });
+  viewer.on('error', () => { showOverlay(false); });
 }
 
 function loadMed(scene) {
@@ -725,10 +725,10 @@ function loadMed(scene) {
       hfov, pitch, yaw,
       minHfov: 60, maxHfov: 120,
       hotSpots: buildHotspots(scene),
-      onLoad: () => {
-        setQualityBadge('50%');
-        loadHigh(scene);
-      }
+    });
+    viewer.on('load', () => {
+      setQualityBadge('50%');
+      loadHigh(scene);
     });
   };
   img.src = scene.med;
@@ -755,13 +755,12 @@ function loadHigh(scene) {
       hfov, pitch, yaw,
       minHfov: 60, maxHfov: 120,
       hotSpots: buildHotspots(scene),
-      onLoad: () => {
-        setQualityBadge('HD');
-        // Fade badge out after 2s
-        setTimeout(() => {
-          document.getElementById('quality-badge').style.opacity = '0';
-        }, 2000);
-      }
+    });
+    viewer.on('load', () => {
+      setQualityBadge('HD');
+      setTimeout(() => {
+        document.getElementById('quality-badge').style.opacity = '0';
+      }, 2000);
     });
   };
   img.src = scene.high;
@@ -867,30 +866,29 @@ async function respond(query) {
   if (local) { appendMsg(local, 'bot'); return; }
 
   try {
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
+    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer YOUR_OPENROUTER_KEY",
+        "HTTP-Referer": "https://vikramvenkatesh96.github.io/360ViewerMock/"
+      },
       body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1000,
-        system: `You are the virtual assistant for "The Collection" — a premium fashion retail destination at New Kalyani Nagar, Pune.
-
-APPROVED KNOWLEDGE BASE:
-${QA.map(q => `- ${q.keys.slice(0,3).join('/')}: ${q.ans}`).join('\n')}
-
-STRICT RULES:
-1. Only answer questions about The Collection. 
-2. For anything unrelated (weather, news, coding, general knowledge), reply exactly: "I can only assist with questions about The Collection — its location, brands, amenities, pricing, and leasing."
-3. Keep replies to 1-2 short sentences. Be warm and professional.
-4. Never invent facts not in the knowledge base.`,
-        messages: [{ role: "user", content: query }]
+        model: "mistralai/mistral-7b-instruct:free",
+        messages: [
+          {
+            role: "system",
+            content: `You are the assistant for "The Collection", a premium retail destination in New Kalyani Nagar, Pune. Only answer questions about this property using this knowledge:\n${QA.map(q => `${q.keys[0]}: ${q.ans}`).join('\n')}\nFor anything unrelated, say: "I can only assist with questions about The Collection." Keep replies to 1-2 sentences.`
+          },
+          { role: "user", content: query }
+        ]
       })
     });
     const data = await res.json();
-    const text = data.content?.map(c => c.text || '').filter(Boolean).join('') || FALLBACK;
+    const text = data.choices?.[0]?.message?.content || FALLBACK;
     appendMsg(text, 'bot');
   } catch (e) {
-    appendMsg(FALLBACK, 'bot');
+    appendMsg(findAnswer(query) || FALLBACK, 'bot');
   }
 }
 
