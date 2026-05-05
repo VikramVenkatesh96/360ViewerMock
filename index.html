@@ -99,6 +99,12 @@
   .pnlm-compass { display: none !important; }
   .pnlm-controls-container { display: none !important; }
 
+  /* Larger hotspots for mobile */
+  .pnlm-hotspot-base { width: 56px !important; height: 56px !important; margin: -28px 0 0 -28px !important; }
+  .pnlm-hotspot.pnlm-scene { width: 56px !important; height: 56px !important; }
+  .pnlm-scene { cursor: pointer; }
+  .pnlm-tooltip span { font-size: 13px !important; padding: 6px 12px !important; }
+
   /* ── PROGRESSIVE LOAD OVERLAY ── */
   #load-overlay {
     position: absolute;
@@ -704,65 +710,67 @@ async function loadScene(scene) {
   viewer.on('error', () => { showOverlay(false); });
 }
 
+// Swap viewer without black flash:
+// Load new image into an off-screen div, only destroy old viewer once new one is ready
+function swapViewer(scene, panoramaUrl, onReady) {
+  if (currentScene?.id !== scene.id || !viewer) return;
+
+  const pitch = viewer.getPitch();
+  const yaw   = viewer.getYaw();
+  const hfov  = viewer.getHfov();
+
+  // Create a hidden staging div
+  const stage = document.createElement('div');
+  stage.style.cssText = 'position:absolute;inset:0;visibility:hidden;pointer-events:none;z-index:-1;';
+  document.getElementById('viewer-wrap').appendChild(stage);
+
+  const next = pannellum.viewer(stage, {
+    type: 'equirectangular',
+    panorama: panoramaUrl,
+    autoLoad: true,
+    showControls: false,
+    compass: false,
+    showFullscreenCtrl: false,
+    showZoomCtrl: false,
+    mouseZoom: false,
+    hfov, pitch, yaw,
+    minHfov: 60, maxHfov: 120,
+    hotSpots: buildHotspots(scene),
+  });
+
+  next.on('load', () => {
+    if (currentScene?.id !== scene.id) { try { next.destroy(); } catch(e){} stage.remove(); return; }
+    // New viewer is ready — destroy old one and promote staging div
+    try { viewer.destroy(); } catch(e){}
+    viewer = null;
+    stage.style.cssText = 'position:absolute;inset:0;z-index:1;';
+    // Re-point #panorama styles to this new container, hand off control
+    viewer = next;
+    onReady();
+  });
+
+  next.on('error', () => { try { next.destroy(); } catch(e){} stage.remove(); });
+}
+
 function loadMed(scene) {
   if (currentScene?.id !== scene.id) return;
   const img = new Image();
-  img.onload = () => {
-    if (currentScene?.id !== scene.id || !viewer) return;
-    const pitch = viewer.getPitch();
-    const yaw = viewer.getYaw();
-    const hfov = viewer.getHfov();
-    viewer.destroy();
-    viewer = pannellum.viewer('panorama', {
-      type: 'equirectangular',
-      panorama: scene.med,
-      autoLoad: true,
-      showControls: false,
-      compass: false,
-      showFullscreenCtrl: false,
-      showZoomCtrl: false,
-      mouseZoom: false,
-      hfov, pitch, yaw,
-      minHfov: 60, maxHfov: 120,
-      hotSpots: buildHotspots(scene),
-    });
-    viewer.on('load', () => {
-      setQualityBadge('50%');
-      loadHigh(scene);
-    });
-  };
+  img.onload = () => swapViewer(scene, scene.med, () => {
+    setQualityBadge('50%');
+    loadHigh(scene);
+  });
   img.src = scene.med;
 }
 
 function loadHigh(scene) {
   if (currentScene?.id !== scene.id) return;
   const img = new Image();
-  img.onload = () => {
-    if (currentScene?.id !== scene.id || !viewer) return;
-    const pitch = viewer.getPitch();
-    const yaw = viewer.getYaw();
-    const hfov = viewer.getHfov();
-    viewer.destroy();
-    viewer = pannellum.viewer('panorama', {
-      type: 'equirectangular',
-      panorama: scene.high,
-      autoLoad: true,
-      showControls: false,
-      compass: false,
-      showFullscreenCtrl: false,
-      showZoomCtrl: false,
-      mouseZoom: false,
-      hfov, pitch, yaw,
-      minHfov: 60, maxHfov: 120,
-      hotSpots: buildHotspots(scene),
-    });
-    viewer.on('load', () => {
-      setQualityBadge('HD');
-      setTimeout(() => {
-        document.getElementById('quality-badge').style.opacity = '0';
-      }, 2000);
-    });
-  };
+  img.onload = () => swapViewer(scene, scene.high, () => {
+    setQualityBadge('HD');
+    setTimeout(() => {
+      document.getElementById('quality-badge').style.opacity = '0';
+    }, 2000);
+  });
   img.src = scene.high;
 }
 
