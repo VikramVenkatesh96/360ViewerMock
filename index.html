@@ -95,20 +95,8 @@
   .pnlm-compass { display: none !important; }
   .pnlm-controls-container { display: none !important; }
 
-  .pnlm-hotspot-base { width: 56px !important; height: 56px !important; margin: -28px 0 0 -28px !important; }
-  .pnlm-hotspot.pnlm-scene { width: 56px !important; height: 56px !important; }
-  .pnlm-scene { cursor: pointer; }
-  .pnlm-tooltip span { font-size: 13px !important; padding: 6px 12px !important; }
-  .pnlm-hotspot.pnlm-scene {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 56 56'%3E%3Ccircle cx='28' cy='28' r='26' fill='rgba(0,0,0,0.55)' stroke='white' stroke-width='2'/%3E%3Cpolygon points='28,14 42,38 14,38' fill='white'/%3E%3C/svg%3E") !important;
-    background-size: 100% !important;
-    background-repeat: no-repeat !important;
-    background-position: center !important;
-    background-color: transparent !important;
-    border: none !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-  }
+  .pnlm-hotspot-base { cursor: pointer; }
+  .pnlm-hotspot-base svg { display: block; }
 
   #load-overlay {
     position: absolute;
@@ -384,25 +372,35 @@ function panoEl(id)     { return document.getElementById('pano-' + id); }
 // sceneId is kept so Pannellum renders the arrow graphic.
 // clickHandlerFunc handles desktop clicks.
 // Mobile touch is handled separately in attachTouchToHotspots().
+const ARROW_SVG = `<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="26" fill="rgba(0,0,0,0.55)" stroke="white" stroke-width="2"/><polygon points="28,14 42,38 14,38" fill="white"/></svg>`;
+
+function makeHotspotEl(div, args) {
+  // args = { text, target }
+  div.setAttribute('data-target', args.target);
+  div.innerHTML = ARROW_SVG;
+  div.style.cssText = 'width:56px;height:56px;cursor:pointer;';
+
+  const tip = document.createElement('span');
+  tip.textContent = args.text;
+  tip.style.cssText = 'position:absolute;bottom:-24px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.7);color:#fff;font-size:11px;font-family:"Helvetica Neue",sans-serif;white-space:nowrap;padding:3px 8px;border-radius:4px;pointer-events:none;';
+  div.appendChild(tip);
+}
+
 function buildHotspots(scene) {
   return scene.hotspots.map(h => ({
-    type: 'scene',
     pitch: h.pitch,
     yaw: h.yaw,
-    text: h.text,
-    sceneId: h.target,
+    createTooltipFunc: makeHotspotEl,
+    createTooltipArgs: { text: h.text, target: h.target },
     clickHandlerFunc: () => goToScene(h.target),
   }));
 }
 
-// After Pannellum renders hotspot <div>s into the DOM, find them and
-// bolt on touchstart/touchend so mobile taps trigger goToScene().
-function attachTouchToHotspots(scene) {
+// After load, find all hotspot divs by data-target and attach touchend.
+function attachTouchToHotspots() {
   const container = panoEl(activeId);
-  const els = container.querySelectorAll('.pnlm-hotspot.pnlm-scene');
-  els.forEach((el, i) => {
-    const h = scene.hotspots[i];
-    if (!h) return;
+  container.querySelectorAll('.pnlm-hotspot-base[data-target]').forEach(el => {
+    const target = el.getAttribute('data-target');
     let moved = false;
     el.addEventListener('touchstart', ()  => { moved = false; }, { passive: true });
     el.addEventListener('touchmove',  ()  => { moved = true;  }, { passive: true });
@@ -410,7 +408,7 @@ function attachTouchToHotspots(scene) {
       if (moved) return;
       e.preventDefault();
       e.stopPropagation();
-      goToScene(h.target);
+      goToScene(target);
     }, { passive: false });
   });
 }
@@ -471,7 +469,7 @@ function crossfade(scene, nextUrl, onDone) {
       const oldId = activeId;
       activeId = nextId;
       if (viewers[oldId]) { try { viewers[oldId].destroy(); } catch(e){} viewers[oldId] = null; }
-      attachTouchToHotspots(scene);
+      attachTouchToHotspots();
       onDone();
     }, 650);
   });
@@ -514,7 +512,7 @@ function loadScene(scene) {
   v.on('load', () => {
     showOverlay(false);
     setQualityBadge('25%');
-    attachTouchToHotspots(scene);
+    attachTouchToHotspots();
     loadQuality(scene, scene.med, '50%', () =>
       loadQuality(scene, scene.high, 'HD', () => {
         setTimeout(() => { document.getElementById('quality-badge').style.opacity = '0'; }, 2000);
