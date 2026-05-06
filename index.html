@@ -31,7 +31,6 @@
     touch-action: none;
   }
 
-  /* ── LAYOUT ── */
   #app {
     display: flex;
     flex-direction: column;
@@ -39,7 +38,6 @@
     height: 100dvh;
   }
 
-  /* ── HEADER ── */
   header {
     flex-shrink: 0;
     display: flex;
@@ -80,7 +78,6 @@
   }
   .scene-label strong { color: var(--gold); font-weight: normal; display: block; font-size: 11px; }
 
-  /* ── VIEWER ── */
   #viewer-wrap {
     flex: 1;
     position: relative;
@@ -93,13 +90,11 @@
     height: 100%;
   }
 
-  /* Override pannellum defaults for mobile */
   .pnlm-container { background: var(--dark) !important; }
   .pnlm-load-box { display: none !important; }
   .pnlm-compass { display: none !important; }
   .pnlm-controls-container { display: none !important; }
 
-  /* Larger hotspots for mobile */
   .pnlm-hotspot-base { width: 56px !important; height: 56px !important; margin: -28px 0 0 -28px !important; }
   .pnlm-hotspot.pnlm-scene { width: 56px !important; height: 56px !important; }
   .pnlm-scene { cursor: pointer; }
@@ -113,9 +108,8 @@
     border: none !important;
     border-radius: 0 !important;
     box-shadow: none !important;
-}
+  }
 
-  /* ── PROGRESSIVE LOAD OVERLAY ── */
   #load-overlay {
     position: absolute;
     inset: 0;
@@ -148,7 +142,6 @@
     font-family: 'Helvetica Neue', sans-serif;
   }
 
-  /* Quality badge */
   #quality-badge {
     position: absolute;
     top: 12px;
@@ -166,7 +159,6 @@
     transition: opacity 0.3s;
   }
 
-  /* ── SCENE NAV STRIP ── */
   #scene-nav {
     flex-shrink: 0;
     display: flex;
@@ -207,11 +199,7 @@
     background: var(--dark3);
     position: relative;
   }
-  .scene-thumb img {
-    width: 100%; height: 100%;
-    object-fit: cover;
-    display: block;
-  }
+  .scene-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .scene-btn.active .scene-thumb { border-color: var(--gold); }
   .scene-btn:active .scene-thumb { transform: scale(0.94); }
 
@@ -246,7 +234,6 @@
 <body>
 
 <div id="app">
-
   <header>
     <div class="logo">
       The Collection
@@ -266,7 +253,6 @@
       <div class="load-text">Loading scene…</div>
     </div>
     <div id="quality-badge">25%</div>
-    <!-- Dev mode: tap anywhere to read pitch/yaw for hotspot placement -->
     <div id="dev-coords" style="display:none;position:absolute;top:12px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);border:1px solid var(--gold);color:var(--gold);font-family:monospace;font-size:13px;padding:8px 16px;border-radius:8px;z-index:60;pointer-events:none;white-space:nowrap;letter-spacing:1px;"></div>
     <button id="dev-toggle" onclick="toggleDevMode()" style="display:none;position:absolute;top:12px;right:12px;background:rgba(201,168,76,0.2);border:1px solid var(--gold);color:var(--gold);font-size:10px;letter-spacing:2px;padding:6px 10px;border-radius:6px;cursor:pointer;z-index:60;font-family:monospace;">DEV: OFF</button>
   </div>
@@ -275,13 +261,7 @@
 </div>
 
 <script>
-// ═══════════════════════════════════════════
-// SCENE DEFINITIONS
-// Hotspot connections define which scenes link
-// to which — edit these to match your layout
-// ═══════════════════════════════════════════
 const SCENES = [
-  // ── Exterior ──
   {
     id: "ext1", group: "Exterior", name: "Exterior 1",
     low:  "images/exterior/1/low.png",
@@ -308,17 +288,16 @@ const SCENES = [
     high: "images/exterior/3/high.jpg",
     hotspots: [
       { pitch: 0, yaw: 35.0, text: "Interior 2", target: "int2" },
-      { pitch: -8.1, yaw: 227.8, ttext: "Exterior 2", target: "ext2" }
+      { pitch: -8.1, yaw: 227.8, text: "Exterior 2", target: "ext2" }
     ]
   },
-  // ── Interior ──
   {
     id: "int1", group: "Interior", name: "Interior 1",
     low:  "images/interior/1/low.jpg",
     med:  "images/interior/1/med.jpg",
     high: "images/interior/1/high.jpg",
     hotspots: [
-      { pitch: -6.0, yaw: 29.8, text: "Interior 2", target: "int2"},
+      { pitch: -6.0, yaw: 29.8, text: "Interior 2", target: "int2" },
       { pitch: -13.3, yaw: 144.6, text: "Interior 4", target: "int4" }
     ]
   },
@@ -329,7 +308,7 @@ const SCENES = [
     high: "images/interior/2/high.jpg",
     hotspots: [
       { pitch: -12.3, yaw: 238.9, text: "Interior 1", target: "int1" },
-      { pitch: -4.4, yaw: 335.5, text: "Interior 7", target: "int7"},
+      { pitch: -4.4, yaw: 335.5, text: "Interior 7", target: "int7" },
     ]
   },
   {
@@ -376,7 +355,7 @@ const SCENES = [
     high: "images/interior/7/high.jpg",
     hotspots: [
       { pitch: -9.2, yaw: 344.4, text: "Interior 2", target: "int2" },
-      { pitch: -1.0, yaw: 2.5, text: "Interior 5", target: "int5" },
+      { pitch: -1.0, yaw: 2.5,   text: "Interior 5", target: "int5" },
       { pitch: -9.2, yaw: 184.2, text: "Interior 6", target: "int6" },
       { pitch: -13.1, yaw: 205.0, text: "Interior 3", target: "int3" }
     ]
@@ -392,22 +371,48 @@ const SCENES = [
   },
 ];
 
-// ═══════════════════════════════════════════
-// PANNELLUM VIEWER + PROGRESSIVE LOADING
-// ═══════════════════════════════════════════
-let viewer = null; // kept for compatibility but unused directly — use viewers{} instead
+// ── State ──
 let currentScene = null;
-let loadStage = 0;
+let activeId = 'a';
+let viewers = { a: null, b: null };
 
+function activeViewer() { return viewers[activeId]; }
+function inactiveId()   { return activeId === 'a' ? 'b' : 'a'; }
+function panoEl(id)     { return document.getElementById('pano-' + id); }
+
+// Build hotspot config for Pannellum.
+// sceneId is kept so Pannellum renders the arrow graphic.
+// clickHandlerFunc handles desktop clicks.
+// Mobile touch is handled separately in attachTouchToHotspots().
 function buildHotspots(scene) {
   return scene.hotspots.map(h => ({
-    type: "scene",
+    type: 'scene',
     pitch: h.pitch,
     yaw: h.yaw,
-    sceneId: h.target,
     text: h.text,
+    sceneId: h.target,
     clickHandlerFunc: () => goToScene(h.target),
   }));
+}
+
+// After Pannellum renders hotspot <div>s into the DOM, find them and
+// bolt on touchstart/touchend so mobile taps trigger goToScene().
+function attachTouchToHotspots(scene) {
+  const container = panoEl(activeId);
+  const els = container.querySelectorAll('.pnlm-hotspot.pnlm-scene');
+  els.forEach((el, i) => {
+    const h = scene.hotspots[i];
+    if (!h) return;
+    let moved = false;
+    el.addEventListener('touchstart', ()  => { moved = false; }, { passive: true });
+    el.addEventListener('touchmove',  ()  => { moved = true;  }, { passive: true });
+    el.addEventListener('touchend',   (e) => {
+      if (moved) return;
+      e.preventDefault();
+      e.stopPropagation();
+      goToScene(h.target);
+    }, { passive: false });
+  });
 }
 
 function showOverlay(show) {
@@ -419,15 +424,6 @@ function setQualityBadge(label) {
   b.textContent = label;
   b.style.opacity = '1';
 }
-
-// ── Dual-buffer crossfade viewer ──
-let activeId = 'a';
-let viewers = { a: null, b: null };
-
-function activeViewer()   { return viewers[activeId]; }
-function inactiveId()     { return activeId === 'a' ? 'b' : 'a'; }
-function inactiveViewer() { return viewers[inactiveId()]; }
-function panoEl(id)       { return document.getElementById('pano-' + id); }
 
 function makeViewer(divId, panorama, opts = {}) {
   const el = panoEl(divId);
@@ -442,9 +438,9 @@ function makeViewer(divId, panorama, opts = {}) {
     showZoomCtrl: false,
     mouseZoom: false,
     minHfov: 60, maxHfov: 120,
-    hfov: opts.hfov || 100,
+    hfov:  opts.hfov  || 100,
     pitch: opts.pitch || 0,
-    yaw: opts.yaw || 0,
+    yaw:   opts.yaw   || 0,
     hotSpots: opts.hotSpots || [],
   });
   return viewers[divId];
@@ -462,7 +458,6 @@ function crossfade(scene, nextUrl, onDone) {
 
   v.on('load', () => {
     if (currentScene?.id !== scene.id) return;
-
     const av2 = activeViewer();
     if (av2) { try { v.setYaw(av2.getYaw()); v.setPitch(av2.getPitch()); } catch(e){} }
 
@@ -476,6 +471,7 @@ function crossfade(scene, nextUrl, onDone) {
       const oldId = activeId;
       activeId = nextId;
       if (viewers[oldId]) { try { viewers[oldId].destroy(); } catch(e){} viewers[oldId] = null; }
+      attachTouchToHotspots(scene);
       onDone();
     }, 650);
   });
@@ -483,18 +479,28 @@ function crossfade(scene, nextUrl, onDone) {
   v.on('error', () => {});
 }
 
-async function loadScene(scene) {
+function loadQuality(scene, url, label, onDone) {
+  if (currentScene?.id !== scene.id) return;
+  const img = new Image();
+  img.onload = () => crossfade(scene, url, () => { setQualityBadge(label); onDone(); });
+  img.onerror = onDone;
+  img.src = url;
+}
+
+function loadScene(scene) {
   if (currentScene?.id === scene.id) return;
   currentScene = scene;
 
   document.getElementById('scene-name-display').textContent = scene.name;
-  document.querySelectorAll('.scene-btn').forEach(b => b.classList.toggle('active', b.dataset.id === scene.id));
+  document.querySelectorAll('.scene-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.id === scene.id)
+  );
 
   showOverlay(true);
   setQualityBadge('25%');
   document.getElementById('quality-badge').style.opacity = '1';
 
-  ['a','b'].forEach(id => {
+  ['a', 'b'].forEach(id => {
     if (viewers[id]) { try { viewers[id].destroy(); } catch(e){} viewers[id] = null; }
     panoEl(id).style.opacity = '0';
     panoEl(id).style.pointerEvents = 'none';
@@ -508,8 +514,9 @@ async function loadScene(scene) {
   v.on('load', () => {
     showOverlay(false);
     setQualityBadge('25%');
-    loadQuality(scene, scene.med,  '50%', () =>
-      loadQuality(scene, scene.high, 'HD',  () => {
+    attachTouchToHotspots(scene);
+    loadQuality(scene, scene.med, '50%', () =>
+      loadQuality(scene, scene.high, 'HD', () => {
         setTimeout(() => { document.getElementById('quality-badge').style.opacity = '0'; }, 2000);
       })
     );
@@ -517,22 +524,13 @@ async function loadScene(scene) {
   v.on('error', () => { showOverlay(false); });
 }
 
-function loadQuality(scene, url, label, onDone) {
-  if (currentScene?.id !== scene.id) return;
-  const img = new Image();
-  img.onload = () => crossfade(scene, url, () => { setQualityBadge(label); onDone(); });
-  img.onerror = onDone;
-  img.src = url;
-}
-
 function goToScene(id) {
   const scene = SCENES.find(s => s.id === id);
   if (scene) loadScene(scene);
 }
 
-// ── DEV MODE ──
+// ── Dev mode ──
 let devMode = false;
-
 function toggleDevMode() {
   devMode = !devMode;
   document.getElementById('dev-toggle').textContent = devMode ? 'DEV: ON ✓' : 'DEV: OFF';
@@ -557,8 +555,8 @@ document.getElementById('viewer-wrap').addEventListener('click', e => {
   const av = activeViewer();
   if (!av) return;
   const pitch = av.getPitch().toFixed(1);
-  const yaw   = ((av.getYaw() % 360) + 360) % 360;
-  const yawF  = yaw.toFixed(1);
+  const yaw = ((av.getYaw() % 360) + 360) % 360;
+  const yawF = yaw.toFixed(1);
   const coordEl = document.getElementById('dev-coords');
   coordEl.textContent = `Scene: ${currentScene?.id} | pitch: ${pitch} | yaw: ${yawF}`;
   navigator.clipboard?.writeText(`{ pitch: ${pitch}, yaw: ${yawF}, text: "Label", target: "scene_id" }`)
@@ -566,13 +564,10 @@ document.getElementById('viewer-wrap').addEventListener('click', e => {
     .catch(() => {});
 });
 
-// ═══════════════════════════════════════════
-// SCENE NAV STRIP
-// ═══════════════════════════════════════════
+// ── Scene nav strip ──
 function buildNav() {
   const nav = document.getElementById('scene-nav');
   let lastGroup = null;
-
   SCENES.forEach(scene => {
     if (scene.group !== lastGroup) {
       const sep = document.createElement('div');
@@ -581,14 +576,12 @@ function buildNav() {
       nav.appendChild(sep);
       lastGroup = scene.group;
     }
-
     const btn = document.createElement('button');
     btn.className = 'scene-btn';
     btn.dataset.id = scene.id;
     btn.setAttribute('role', 'listitem');
     btn.setAttribute('aria-label', scene.name);
     btn.onclick = () => loadScene(scene);
-
     btn.innerHTML = `
       <div class="scene-thumb">
         <img src="${scene.low}" alt="${scene.name}" loading="lazy">
@@ -600,9 +593,6 @@ function buildNav() {
   });
 }
 
-// ═══════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════
 buildNav();
 loadScene(SCENES[0]);
 </script>
