@@ -104,6 +104,16 @@
   .pnlm-hotspot.pnlm-scene { width: 56px !important; height: 56px !important; }
   .pnlm-scene { cursor: pointer; }
   .pnlm-tooltip span { font-size: 13px !important; padding: 6px 12px !important; }
+  .pnlm-hotspot.pnlm-scene {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 56 56'%3E%3Ccircle cx='28' cy='28' r='26' fill='rgba(0,0,0,0.55)' stroke='white' stroke-width='2'/%3E%3Cpolygon points='28,14 42,38 14,38' fill='white'/%3E%3C/svg%3E") !important;
+    background-size: 100% !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
 
   /* ── PROGRESSIVE LOAD OVERLAY ── */
   #load-overlay {
@@ -499,7 +509,7 @@ const SCENES = [
     high: "images/exterior/2/high.jpg",
     hotspots: [
       { pitch: -7.4, yaw: 83.8, text: "Exterior 1", target: "ext1" },
-      { pitch: -10.0, yaw: 264.5, text: "Exterior 3", target: "ext3" }
+      { pitch: -3.0, yaw: 264.5, text: "Exterior 3", target: "ext3" }
     ]
   },
   {
@@ -519,8 +529,8 @@ const SCENES = [
     med:  "images/interior/1/med.jpg",
     high: "images/interior/1/high.jpg",
     hotspots: [
-      { pitch: -6.0, yaw: 36.2, text: "Interior 2", target: "int2"},
-      { pitch: -13.3, yaw: 146.6, text: "Interior 4", target: "int4" }
+      { pitch: -6.0, yaw: 33.2, text: "Interior 2", target: "int2"},
+      { pitch: -13.3, yaw: 128.6, text: "Interior 4", target: "int4" }
     ]
   },
   {
@@ -531,7 +541,6 @@ const SCENES = [
     hotspots: [
       { pitch: -12.3, yaw: 238.9, text: "Interior 1", target: "int1" },
       { pitch: -4.4, yaw: 335.5, text: "Interior 7", target: "int7"},
-      { pitch: -11.9, yaw: 234.3, text: "Interior 8", target: "int8" }
     ]
   },
   {
@@ -540,7 +549,8 @@ const SCENES = [
     med:  "images/interior/3/med.jpg",
     high: "images/interior/3/high.jpg",
     hotspots: [
-      { pitch: -8.8, yaw: 283.5, text: "Interior 7", target: "int7" },
+      { pitch: -18.4, yaw: 296.7, text: "Interior 8", target: "int8" },
+      { pitch: -8.8, yaw: 275.5, text: "Interior 7", target: "int7" },
     ]
   },
   {
@@ -577,7 +587,7 @@ const SCENES = [
     high: "images/interior/7/high.jpg",
     hotspots: [
       { pitch: -9.2, yaw: 344.4, text: "Interior 2", target: "int2" },
-      { pitch: -1.0, yaw: 8.2, text: "Interior 5", target: "int5" },
+      { pitch: -1.0, yaw: 0, text: "Interior 5", target: "int5" },
       { pitch: -9.2, yaw: 184.2, text: "Interior 6", target: "int6" },
       { pitch: -13.1, yaw: 205.0, text: "Interior 3", target: "int3" }
     ]
