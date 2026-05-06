@@ -88,7 +88,7 @@
     min-height: 0;
   }
 
-  #panorama {
+  #pano-a, #pano-b {
     width: 100%;
     height: 100%;
   }
@@ -439,13 +439,13 @@
   </header>
 
   <div id="viewer-wrap">
-    <div id="panorama"></div>
+    <div id="pano-a" style="position:absolute;inset:0;transition:opacity 0.6s ease;"></div>
+    <div id="pano-b" style="position:absolute;inset:0;opacity:0;transition:opacity 0.6s ease;"></div>
     <div id="load-overlay">
       <div class="load-spinner"></div>
       <div class="load-text">Loading scene…</div>
     </div>
     <div id="quality-badge">25%</div>
-
     <button id="chat-fab" onclick="openChat()" aria-label="Open assistant">💬</button>
   </div>
 
@@ -647,9 +647,9 @@ const FALLBACK = "I can only answer questions about The Collection — its locat
 // ═══════════════════════════════════════════
 // PANNELLUM VIEWER + PROGRESSIVE LOADING
 // ═══════════════════════════════════════════
-let viewer = null;
+let viewer = null; // kept for compatibility but unused directly — use viewers{} instead
 let currentScene = null;
-let loadStage = 0; // 0=low,1=med,2=high
+let loadStage = 0;
 
 function buildHotspots(scene) {
   return scene.hotspots.map(h => ({
@@ -667,111 +667,129 @@ function showOverlay(show) {
 }
 
 function setQualityBadge(label) {
-  document.getElementById('quality-badge').textContent = label;
+  const b = document.getElementById('quality-badge');
+  b.textContent = label;
+  b.style.opacity = '1';
+}
+
+// ── Dual-buffer crossfade viewer ──
+// Two pannellum divs (pano-a, pano-b) are always alive.
+// "active" is the visible one the user is interacting with.
+// When upgrading quality: load into the inactive div at the same
+// pitch/yaw/hfov, then crossfade opacity. No WebGL restart on the
+// active viewer = zero stutter.
+
+let activeId = 'a';          // which pano div is currently shown
+let viewers = { a: null, b: null };
+
+function activeViewer()   { return viewers[activeId]; }
+function inactiveId()     { return activeId === 'a' ? 'b' : 'a'; }
+function inactiveViewer() { return viewers[inactiveId()]; }
+function panoEl(id)       { return document.getElementById('pano-' + id); }
+
+function makeViewer(divId, panorama, opts = {}) {
+  const el = panoEl(divId);
+  if (viewers[divId]) { try { viewers[divId].destroy(); } catch(e){} viewers[divId] = null; }
+  viewers[divId] = pannellum.viewer(el, {
+    type: 'equirectangular',
+    panorama,
+    autoLoad: true,
+    showControls: false,
+    compass: false,
+    showFullscreenCtrl: false,
+    showZoomCtrl: false,
+    mouseZoom: false,
+    minHfov: 60, maxHfov: 120,
+    hfov: opts.hfov || 100,
+    pitch: opts.pitch || 0,
+    yaw: opts.yaw || 0,
+    hotSpots: opts.hotSpots || [],
+  });
+  return viewers[divId];
+}
+
+// Crossfade: load nextUrl into inactive buffer, then swap
+function crossfade(scene, nextUrl, onDone) {
+  if (currentScene?.id !== scene.id) return;
+  const av = activeViewer();
+  const pitch = av ? av.getPitch() : 0;
+  const yaw   = av ? av.getYaw()   : 0;
+  const hfov  = av ? av.getHfov()  : 100;
+  const nextId = inactiveId();
+
+  const v = makeViewer(nextId, nextUrl, { pitch, yaw, hfov, hotSpots: buildHotspots(scene) });
+
+  v.on('load', () => {
+    if (currentScene?.id !== scene.id) return;
+
+    // Sync position one more time (user may have panned while loading)
+    const av2 = activeViewer();
+    if (av2) { try { v.setYaw(av2.getYaw()); v.setPitch(av2.getPitch()); } catch(e){} }
+
+    // Fade inactive (next) in, active out simultaneously
+    panoEl(nextId).style.opacity = '1';
+    panoEl(nextId).style.pointerEvents = 'auto';
+    panoEl(activeId).style.opacity = '0';
+    panoEl(activeId).style.pointerEvents = 'none';
+
+    // After transition, clean up the now-hidden old viewer
+    setTimeout(() => {
+      if (currentScene?.id !== scene.id) return;
+      const oldId = activeId;
+      activeId = nextId;          // promote next → active
+      // Destroy old viewer to free GPU memory
+      if (viewers[oldId]) { try { viewers[oldId].destroy(); } catch(e){} viewers[oldId] = null; }
+      onDone();
+    }, 650); // slightly longer than the 0.6s CSS transition
+  });
+
+  v.on('error', () => { /* silently ignore, user keeps seeing current quality */ });
 }
 
 async function loadScene(scene) {
   if (currentScene?.id === scene.id) return;
   currentScene = scene;
-  loadStage = 0;
 
-  // Update UI
   document.getElementById('scene-name-display').textContent = scene.name;
   document.querySelectorAll('.scene-btn').forEach(b => b.classList.toggle('active', b.dataset.id === scene.id));
 
   showOverlay(true);
   setQualityBadge('25%');
+  document.getElementById('quality-badge').style.opacity = '1';
 
-  // Destroy old viewer
-  if (viewer) { try { viewer.destroy(); } catch(e){} viewer = null; }
-
-  // Stage 1: low quality — show immediately
-  viewer = pannellum.viewer('panorama', {
-    type: 'equirectangular',
-    panorama: scene.low,
-    autoLoad: true,
-    showControls: false,
-    compass: false,
-    showFullscreenCtrl: false,
-    showZoomCtrl: false,
-    mouseZoom: false,
-    hfov: 100,
-    minHfov: 60,
-    maxHfov: 120,
-    pitch: 0,
-    yaw: 0,
-    hotSpots: buildHotspots(scene),
+  // Destroy both viewers for a clean scene switch
+  ['a','b'].forEach(id => {
+    if (viewers[id]) { try { viewers[id].destroy(); } catch(e){} viewers[id] = null; }
+    panoEl(id).style.opacity = '0';
+    panoEl(id).style.pointerEvents = 'none';
   });
-  viewer.on('load', () => {
+  activeId = 'a';
+
+  // Load low quality into active buffer
+  const v = makeViewer('a', scene.low, { hotSpots: buildHotspots(scene) });
+  panoEl('a').style.opacity = '1';
+  panoEl('a').style.pointerEvents = 'auto';
+
+  v.on('load', () => {
     showOverlay(false);
     setQualityBadge('25%');
-    loadMed(scene);
+    // Kick off background loads
+    loadQuality(scene, scene.med,  '50%', () =>
+      loadQuality(scene, scene.high, 'HD',  () => {
+        setTimeout(() => { document.getElementById('quality-badge').style.opacity = '0'; }, 2000);
+      })
+    );
   });
-  viewer.on('error', () => { showOverlay(false); });
+  v.on('error', () => { showOverlay(false); });
 }
 
-// Swap viewer without black flash:
-// Load new image into an off-screen div, only destroy old viewer once new one is ready
-function swapViewer(scene, panoramaUrl, onReady) {
-  if (currentScene?.id !== scene.id || !viewer) return;
-
-  const pitch = viewer.getPitch();
-  const yaw   = viewer.getYaw();
-  const hfov  = viewer.getHfov();
-
-  // Create a hidden staging div
-  const stage = document.createElement('div');
-  stage.style.cssText = 'position:absolute;inset:0;visibility:hidden;pointer-events:none;z-index:-1;';
-  document.getElementById('viewer-wrap').appendChild(stage);
-
-  const next = pannellum.viewer(stage, {
-    type: 'equirectangular',
-    panorama: panoramaUrl,
-    autoLoad: true,
-    showControls: false,
-    compass: false,
-    showFullscreenCtrl: false,
-    showZoomCtrl: false,
-    mouseZoom: false,
-    hfov, pitch, yaw,
-    minHfov: 60, maxHfov: 120,
-    hotSpots: buildHotspots(scene),
-  });
-
-  next.on('load', () => {
-    if (currentScene?.id !== scene.id) { try { next.destroy(); } catch(e){} stage.remove(); return; }
-    // New viewer is ready — destroy old one and promote staging div
-    try { viewer.destroy(); } catch(e){}
-    viewer = null;
-    stage.style.cssText = 'position:absolute;inset:0;z-index:1;';
-    // Re-point #panorama styles to this new container, hand off control
-    viewer = next;
-    onReady();
-  });
-
-  next.on('error', () => { try { next.destroy(); } catch(e){} stage.remove(); });
-}
-
-function loadMed(scene) {
+function loadQuality(scene, url, label, onDone) {
   if (currentScene?.id !== scene.id) return;
+  // Preload image first so crossfade is instant once it arrives
   const img = new Image();
-  img.onload = () => swapViewer(scene, scene.med, () => {
-    setQualityBadge('50%');
-    loadHigh(scene);
-  });
-  img.src = scene.med;
-}
-
-function loadHigh(scene) {
-  if (currentScene?.id !== scene.id) return;
-  const img = new Image();
-  img.onload = () => swapViewer(scene, scene.high, () => {
-    setQualityBadge('HD');
-    setTimeout(() => {
-      document.getElementById('quality-badge').style.opacity = '0';
-    }, 2000);
-  });
-  img.src = scene.high;
+  img.onload = () => crossfade(scene, url, () => { setQualityBadge(label); onDone(); });
+  img.onerror = onDone; // skip this quality level on error
+  img.src = url;
 }
 
 function goToScene(id) {
