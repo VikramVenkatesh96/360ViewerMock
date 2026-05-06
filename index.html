@@ -217,6 +217,126 @@
     text-overflow: ellipsis;
   }
   .scene-btn.active .scene-name { color: var(--gold); }
+  /* =========================
+   CHATBOT
+========================= */
+
+#chatbot-container {
+  position: absolute;
+  bottom: calc(90px + var(--safe-bottom));
+  right: 16px;
+  z-index: 500;
+  font-family: 'Helvetica Neue', sans-serif;
+}
+
+#chat-toggle {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  border: none;
+  background: var(--gold);
+  color: black;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+#chat-window {
+  width: 340px;
+  height: 460px;
+  background: rgba(20,20,20,0.96);
+  border: 1px solid var(--gold-dim);
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+  backdrop-filter: blur(10px);
+}
+
+#chat-window.hidden {
+  display: none;
+}
+
+#chat-header {
+  padding: 14px;
+  background: var(--dark2);
+  color: var(--gold);
+  font-size: 14px;
+  letter-spacing: 1px;
+  border-bottom: 1px solid rgba(201,168,76,0.2);
+}
+
+#chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chat-msg {
+  max-width: 85%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.chat-user {
+  align-self: flex-end;
+  background: var(--gold);
+  color: black;
+}
+
+.chat-bot {
+  align-self: flex-start;
+  background: #2a2a2a;
+  color: white;
+}
+
+#chat-input-wrap {
+  display: flex;
+  border-top: 1px solid rgba(201,168,76,0.15);
+}
+
+#chat-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 14px;
+  background: #111;
+  color: white;
+  font-size: 14px;
+}
+
+#chat-send {
+  border: none;
+  background: var(--gold);
+  color: black;
+  padding: 0 18px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* MOBILE */
+
+@media (max-width: 768px) {
+
+  #chat-window {
+    width: calc(100vw - 24px);
+    height: 65vh;
+    position: fixed;
+    right: 12px;
+    bottom: 85px;
+  }
+
+  #chat-toggle {
+    width: 56px;
+    height: 56px;
+  }
+}
 </style>
 </head>
 <body>
@@ -247,7 +367,32 @@
 
   <div id="scene-nav" role="list" aria-label="Scenes"></div>
 </div>
+<!-- CHATBOT -->
+<div id="chatbot-container">
 
+  <button id="chat-toggle">
+    💬
+  </button>
+
+  <div id="chat-window" class="hidden">
+
+    <div id="chat-header">
+      Property Assistant
+    </div>
+
+    <div id="chat-messages"></div>
+
+    <div id="chat-input-wrap">
+      <input
+        type="text"
+        id="chat-input"
+        placeholder="Ask about the property..."
+      />
+      <button id="chat-send">Send</button>
+    </div>
+
+  </div>
+</div>
 <script>
 const SCENES = [
   {
@@ -593,6 +738,132 @@ function buildNav() {
 
 buildNav();
 loadScene(SCENES[0]);
+
+/* ===================================
+   CHATBOT
+=================================== */
+
+const CHAT_DATA = [
+
+  {
+    keywords: ["price", "cost", "rate"],
+    answer: "The property pricing starts from ₹1.8 Cr onwards depending on the unit configuration."
+  },
+
+  {
+    keywords: ["bedroom", "bhk", "rooms"],
+    answer: "The project offers spacious 2BHK, 3BHK and 4BHK residences."
+  },
+
+  {
+    keywords: ["parking", "car parking"],
+    answer: "Yes, dedicated covered parking is available for residents and visitors."
+  },
+
+  {
+    keywords: ["gym", "fitness"],
+    answer: "A fully equipped modern gymnasium is included in the amenities."
+  },
+
+  {
+    keywords: ["location", "where", "address"],
+    answer: "The project is located in New Kalyani Nagar, Pune."
+  },
+
+  {
+    keywords: ["amenities", "facilities"],
+    answer: "Amenities include a clubhouse, swimming pool, gym, landscaped gardens, children's play area, and jogging track."
+  },
+
+  {
+    keywords: ["pool", "swimming"],
+    answer: "Yes, the property includes a luxury swimming pool."
+  },
+
+  {
+    keywords: ["security", "safe"],
+    answer: "The property includes 24/7 security surveillance and gated access."
+  }
+
+];
+
+const chatToggle = document.getElementById("chat-toggle");
+const chatWindow = document.getElementById("chat-window");
+const chatMessages = document.getElementById("chat-messages");
+const chatInput = document.getElementById("chat-input");
+const chatSend = document.getElementById("chat-send");
+
+chatToggle.addEventListener("click", () => {
+  chatWindow.classList.toggle("hidden");
+});
+
+function addMessage(text, sender) {
+
+  const div = document.createElement("div");
+
+  div.className = `chat-msg ${sender === 'user' ? 'chat-user' : 'chat-bot'}`;
+
+  div.textContent = text;
+
+  chatMessages.appendChild(div);
+
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function findBestAnswer(message) {
+
+  const msg = message.toLowerCase();
+
+  for (const item of CHAT_DATA) {
+
+    for (const keyword of item.keywords) {
+
+      if (msg.includes(keyword)) {
+        return item.answer;
+      }
+    }
+  }
+
+  return "I'm sorry, I don't have information about that yet. Please contact our sales representative for more details.";
+}
+
+function sendMessage() {
+
+  const text = chatInput.value.trim();
+
+  if (!text) return;
+
+  addMessage(text, "user");
+
+  chatInput.value = "";
+
+  setTimeout(() => {
+
+    const response = findBestAnswer(text);
+
+    addMessage(response, "bot");
+
+  }, 400);
+}
+
+chatSend.addEventListener("click", sendMessage);
+
+chatInput.addEventListener("keypress", e => {
+  if (e.key === "Enter") {
+    sendMessage();
+  }
+});
+
+/* Welcome message */
+
+setTimeout(() => {
+
+  addMessage(
+    "Hello 👋 Ask me anything about the property, amenities, pricing or layout.",
+    "bot"
+  );
+
+}, 800);
 </script>
 </body>
 </html>
