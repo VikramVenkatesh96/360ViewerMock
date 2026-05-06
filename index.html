@@ -324,20 +324,33 @@
 
 @media (max-width: 768px) {
 
-  #chat-window {
-    width: calc(100vw - 24px);
-    height: 65vh;
+  #chatbot-container {
     position: fixed;
     right: 12px;
-    bottom: 90px;
+    bottom: calc(90px + var(--safe-bottom));
+    z-index: 500;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+  }
+
+  #chat-window {
+    width: calc(100vw - 24px);
+    max-width: 420px;
+    height: 65vh;
+    position: relative;
+    right: auto;
+    bottom: auto;
     border-radius: 18px;
   }
 
   #chat-toggle {
     width: 56px;
     height: 56px;
-    position: relative;
-    z-index: 501;
+
+    flex-shrink: 0;
   }
 }
 </style>
