@@ -268,11 +268,13 @@
     border-radius: 18px 18px 0 0;
     display: flex;
     flex-direction: column;
-    max-height: 72vh;
+    /* Height is set in JS to avoid collapsing on mobile keyboard */
+    height: 52vh;
     transform: translateY(100%);
     transition: transform 0.35s cubic-bezier(0.32,0,0.15,1);
     pointer-events: all;
     overflow: hidden;
+    will-change: transform;
   }
   #chat-panel.open { transform: translateY(0); }
 
@@ -446,6 +448,9 @@
       <div class="load-text">Loading scene…</div>
     </div>
     <div id="quality-badge">25%</div>
+    <!-- Dev mode: tap anywhere to read pitch/yaw for hotspot placement -->
+    <div id="dev-coords" style="display:none;position:absolute;top:12px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);border:1px solid var(--gold);color:var(--gold);font-family:monospace;font-size:13px;padding:8px 16px;border-radius:8px;z-index:60;pointer-events:none;white-space:nowrap;letter-spacing:1px;"></div>
+    <button id="dev-toggle" onclick="toggleDevMode()" style="display:none;position:absolute;top:12px;right:12px;background:rgba(201,168,76,0.2);border:1px solid var(--gold);color:var(--gold);font-size:10px;letter-spacing:2px;padding:6px 10px;border-radius:6px;cursor:pointer;z-index:60;font-family:monospace;">DEV: OFF</button>
     <button id="chat-fab" onclick="openChat()" aria-label="Open assistant">💬</button>
   </div>
 
@@ -797,6 +802,47 @@ function goToScene(id) {
   if (scene) loadScene(scene);
 }
 
+// ── DEV MODE: tap anywhere to get pitch/yaw for hotspot placement ──
+let devMode = false;
+
+function toggleDevMode() {
+  devMode = !devMode;
+  document.getElementById('dev-toggle').textContent = devMode ? 'DEV: ON ✓' : 'DEV: OFF';
+  document.getElementById('dev-toggle').style.background = devMode ? 'rgba(201,168,76,0.4)' : 'rgba(201,168,76,0.2)';
+  document.getElementById('dev-coords').style.display = devMode ? 'block' : 'none';
+  if (devMode) document.getElementById('dev-coords').textContent = 'Tap anywhere to get pitch/yaw';
+}
+
+// Expose dev toggle: tap header logo 5× to reveal the DEV button
+let logoTaps = 0, logoTimer;
+document.querySelector('.logo').addEventListener('click', () => {
+  logoTaps++;
+  clearTimeout(logoTimer);
+  logoTimer = setTimeout(() => { logoTaps = 0; }, 2000);
+  if (logoTaps >= 5) {
+    document.getElementById('dev-toggle').style.display = 'block';
+    logoTaps = 0;
+  }
+});
+
+// Listen for clicks on viewer to report coords
+document.getElementById('viewer-wrap').addEventListener('click', e => {
+  if (!devMode) return;
+  const av = activeViewer();
+  if (!av) return;
+  // pannellum reports current center — for a real click we read center coords
+  // since pannellum doesn't expose click-to-coords API, we show current view center
+  const pitch = av.getPitch().toFixed(1);
+  const yaw   = ((av.getYaw() % 360) + 360) % 360;
+  const yawF  = yaw.toFixed(1);
+  const coordEl = document.getElementById('dev-coords');
+  coordEl.textContent = `Scene: ${currentScene?.id} | pitch: ${pitch} | yaw: ${yawF}`;
+  // Also copy to clipboard
+  navigator.clipboard?.writeText(`{ pitch: ${pitch}, yaw: ${yawF}, text: "Label", target: "scene_id" }`)
+    .then(() => { coordEl.textContent += '  ✓ copied!'; })
+    .catch(() => {});
+});
+
 // ═══════════════════════════════════════════
 // SCENE NAV STRIP
 // ═══════════════════════════════════════════
@@ -840,28 +886,54 @@ function openChat() {
   chatOpen = true;
   document.getElementById('chat-panel').classList.add('open');
   document.getElementById('chat-backdrop').classList.add('visible');
-  // Auto-focus input after animation
-  setTimeout(() => document.getElementById('chat-input').focus(), 380);
+  // Do NOT auto-focus on open — let user tap the input themselves.
+  // Auto-focusing triggers keyboard which resizes viewport and collapses the panel.
 }
 
 function closeChat() {
   chatOpen = false;
+  document.getElementById('chat-input').blur(); // dismiss keyboard first
   document.getElementById('chat-panel').classList.remove('open');
   document.getElementById('chat-backdrop').classList.remove('visible');
-  document.getElementById('chat-input').blur();
 }
 
-// Close on swipe down
+// Prevent the panel from resizing when the keyboard opens.
+// Strategy: fix the chat-drawer to the visual viewport, not the layout viewport.
+(function lockChatToVisualViewport() {
+  const panel = document.getElementById('chat-panel');
+  const drawer = document.getElementById('chat-drawer');
+
+  function onViewportChange() {
+    // When keyboard opens, visualViewport shrinks. We pin the drawer
+    // to the top of the visual viewport so it doesn't get pushed up.
+    if (!window.visualViewport) return;
+    const vv = window.visualViewport;
+    drawer.style.top    = vv.offsetTop + 'px';
+    drawer.style.height = vv.height + 'px';
+    drawer.style.left   = vv.offsetLeft + 'px';
+    drawer.style.width  = vv.width + 'px';
+  }
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', onViewportChange);
+    window.visualViewport.addEventListener('scroll', onViewportChange);
+  }
+})();
+
+// Close on swipe down — only when dragging the handle/header, not the message list
 let dragStart = null;
+let dragOnHandle = false;
 document.getElementById('chat-panel').addEventListener('touchstart', e => {
+  const handle = e.target.closest('.chat-drag-handle, .chat-header');
+  dragOnHandle = !!handle;
   dragStart = e.touches[0].clientY;
 }, { passive: true });
 document.getElementById('chat-panel').addEventListener('touchmove', e => {
-  if (!dragStart) return;
+  if (!dragStart || !dragOnHandle) return;
   const dy = e.touches[0].clientY - dragStart;
-  if (dy > 60) { closeChat(); dragStart = null; }
+  if (dy > 50) { closeChat(); dragStart = null; }
 }, { passive: true });
-document.getElementById('chat-panel').addEventListener('touchend', () => { dragStart = null; }, { passive: true });
+document.getElementById('chat-panel').addEventListener('touchend', () => { dragStart = null; dragOnHandle = false; }, { passive: true });
 
 function appendMsg(text, role) {
   const body = document.getElementById('chat-body');
