@@ -3,21 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#0d0d0d">
-<title>Virtual Tour</title>
+<meta name="theme-color" content="#0a0a0a">
+<title>Virtual Tour — The Collection</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css">
 <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
 <style>
-  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  *, *::before, *::after {
+    margin: 0; padding: 0; box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
 
   :root {
-    --gold: #c9a84c;
-    --gold-dim: rgba(201,168,76,0.35);
-    --dark: #0d0d0d;
-    --dark2: #161616;
-    --dark3: #1f1f1f;
-    --text: #f0ece3;
-    --muted: #7a7570;
+    --gold: #c8a96e;
+    --gold-light: #e2c98a;
+    --gold-dim: rgba(200,169,110,0.2);
+    --gold-glow: rgba(200,169,110,0.08);
+    --dark: #0a0a0a;
+    --pill-bg: rgba(12,12,12,0.82);
+    --pill-border: rgba(255,255,255,0.08);
+    --text: #f5f0e8;
+    --muted: rgba(245,240,232,0.4);
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
   }
@@ -27,329 +34,477 @@
     overflow: hidden;
     background: var(--dark);
     color: var(--text);
-    font-family: 'Georgia', serif;
+    font-family: 'Outfit', sans-serif;
     touch-action: none;
   }
 
-  /* ── LAYOUT ── */
+  /* ── FULL-BLEED VIEWER ── */
   #app {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+    position: fixed;
+    inset: 0;
     height: 100dvh;
   }
 
-  /* ── HEADER ── */
-  header {
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 16px;
-    padding-top: calc(10px + var(--safe-top));
-    background: var(--dark);
-    border-bottom: 1px solid rgba(201,168,76,0.2);
-    z-index: 200;
-    gap: 10px;
-  }
-
-  .logo {
-    font-size: 15px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--gold);
-    white-space: nowrap;
-  }
-  .logo small {
-    display: block;
-    font-size: 9px;
-    letter-spacing: 2px;
-    color: var(--muted);
-    margin-top: 1px;
-    font-family: 'Helvetica Neue', sans-serif;
-  }
-
-  .scene-label {
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--muted);
-    font-family: 'Helvetica Neue', sans-serif;
-    text-align: right;
-    white-space: nowrap;
-  }
-  .scene-label strong { color: var(--gold); font-weight: normal; display: block; font-size: 11px; }
-
-  /* ── VIEWER ── */
   #viewer-wrap {
-    flex: 1;
-    position: relative;
-    overflow: hidden;
-    min-height: 0;
+    position: absolute;
+    inset: 0;
   }
 
   #pano-a, #pano-b {
-    width: 100%;
-    height: 100%;
+    width: 100%; height: 100%;
   }
 
-  /* Override pannellum defaults for mobile */
   .pnlm-container { background: var(--dark) !important; }
   .pnlm-load-box { display: none !important; }
   .pnlm-compass { display: none !important; }
   .pnlm-controls-container { display: none !important; }
 
-  /* Larger hotspots for mobile */
-  .pnlm-hotspot-base { width: 56px !important; height: 56px !important; margin: -28px 0 0 -28px !important; }
-  .pnlm-hotspot.pnlm-scene { width: 56px !important; height: 56px !important; }
-  .pnlm-scene { cursor: pointer; }
-  .pnlm-tooltip span { font-size: 13px !important; padding: 6px 12px !important; }
+  /* Let pannellum render hotspots completely naturally —
+     only tint the tooltip to match our gold theme */
+  .pnlm-scene { cursor: pointer !important; }
 
-  /* ── PROGRESSIVE LOAD OVERLAY ── */
+  .pnlm-tooltip span {
+    font-family: 'Outfit', sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 300 !important;
+    letter-spacing: 2px !important;
+    text-transform: uppercase !important;
+    padding: 6px 14px !important;
+    border-radius: 20px !important;
+    background: rgba(10,10,10,0.88) !important;
+    border: 1px solid rgba(200,169,110,0.2) !important;
+    color: #e2c98a !important;
+    white-space: nowrap !important;
+  }
+
+  /* ── LOADING OVERLAY ── */
   #load-overlay {
     position: absolute;
     inset: 0;
     z-index: 50;
-    pointer-events: none;
-    transition: opacity 0.4s ease;
     background: var(--dark);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    gap: 14px;
+    gap: 18px;
+    transition: opacity 0.5s ease;
   }
   #load-overlay.hidden { opacity: 0; pointer-events: none; }
 
-  .load-spinner {
-    width: 40px; height: 40px;
-    border: 2px solid rgba(201,168,76,0.2);
-    border-top-color: var(--gold);
+  .load-ring {
+    width: 44px; height: 44px;
+    position: relative;
+  }
+  .load-ring::before, .load-ring::after {
+    content: '';
+    position: absolute;
     border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+  }
+  .load-ring::before {
+    inset: 0;
+    border: 1px solid rgba(200,169,110,0.12);
+  }
+  .load-ring::after {
+    inset: 0;
+    border: 1px solid transparent;
+    border-top-color: var(--gold);
+    animation: spin 0.9s cubic-bezier(0.6,0,0.4,1) infinite;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  .load-text {
-    font-size: 10px;
-    letter-spacing: 3px;
+  .load-wordmark {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    letter-spacing: 5px;
     text-transform: uppercase;
-    color: var(--muted);
-    font-family: 'Helvetica Neue', sans-serif;
+    color: rgba(200,169,110,0.6);
+    font-weight: 300;
   }
 
-  /* Quality badge */
-  #quality-badge {
+  /* ── TOP HEADER (floating) ── */
+  #top-bar {
     position: absolute;
-    top: 12px;
-    left: 12px;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: calc(14px + var(--safe-top)) 16px 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    pointer-events: none;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, transparent 100%);
+  }
+
+  .logo-block {
+    pointer-events: all;
+  }
+  .logo-eyebrow {
+    font-family: 'Outfit', sans-serif;
+    font-size: 8px;
+    font-weight: 400;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 3px;
+    opacity: 0.8;
+  }
+  .logo-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 300;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--text);
+    line-height: 1;
+  }
+  .logo-sub {
+    font-family: 'Outfit', sans-serif;
+    font-size: 8.5px;
+    letter-spacing: 1.5px;
+    color: rgba(245,240,232,0.35);
+    margin-top: 3px;
+    text-transform: uppercase;
+  }
+
+  .top-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    pointer-events: all;
+  }
+
+  #quality-badge {
+    font-family: 'Outfit', sans-serif;
     font-size: 9px;
     letter-spacing: 2px;
     text-transform: uppercase;
-    font-family: 'Helvetica Neue', sans-serif;
     color: var(--gold);
     background: rgba(0,0,0,0.5);
     border: 1px solid var(--gold-dim);
-    padding: 3px 8px;
+    padding: 4px 10px;
     border-radius: 20px;
-    z-index: 30;
-    transition: opacity 0.3s;
+    transition: opacity 0.4s;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
 
-  /* ── SCENE NAV STRIP ── */
+  .icon-btn {
+    width: 36px; height: 36px;
+    background: rgba(0,0,0,0.45);
+    border: 1px solid var(--pill-border);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    font-size: 15px;
+    transition: background 0.15s, transform 0.15s;
+  }
+  .icon-btn:active { transform: scale(0.9); background: rgba(200,169,110,0.15); }
+
+  /* ── SCENE NAME PILL (center floating) ── */
+  #scene-pill {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, calc(-50% - 60px));
+    z-index: 90;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  #scene-pill.show { opacity: 1; }
+
+  .scene-pill-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 300;
+    letter-spacing: 3px;
+    color: var(--text);
+    text-shadow: 0 2px 20px rgba(0,0,0,0.7);
+    white-space: nowrap;
+  }
+  .scene-pill-group {
+    font-family: 'Outfit', sans-serif;
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    opacity: 0.7;
+  }
+
+  /* ── BOTTOM UI ── */
+  #bottom-ui {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 0 0 calc(10px + var(--safe-bottom));
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 100%);
+    padding-top: 40px;
+  }
+
+  /* Scene nav — pill buttons */
   #scene-nav {
-    flex-shrink: 0;
     display: flex;
     overflow-x: auto;
-    overflow-y: hidden;
-    gap: 8px;
-    padding: 10px 12px;
-    padding-bottom: calc(10px + var(--safe-bottom));
-    background: var(--dark2);
-    border-top: 1px solid rgba(201,168,76,0.15);
+    gap: 7px;
+    padding: 0 14px;
+    scrollbar-width: none;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
   }
   #scene-nav::-webkit-scrollbar { display: none; }
 
-  .scene-btn {
+  /* Group label in nav */
+  .nav-group-label {
     flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-    cursor: pointer;
-    scroll-snap-align: start;
-    border: none;
-    background: none;
-    padding: 0;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  .scene-thumb {
-    width: 64px;
-    height: 44px;
-    border-radius: 6px;
-    overflow: hidden;
-    border: 2px solid transparent;
-    transition: border-color 0.2s, transform 0.15s;
-    background: var(--dark3);
-    position: relative;
-  }
-  .scene-thumb img {
-    width: 100%; height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-  .scene-btn.active .scene-thumb { border-color: var(--gold); }
-  .scene-btn:active .scene-thumb { transform: scale(0.94); }
-
-  .scene-thumb-tag {
-    position: absolute;
-    top: 3px; left: 3px;
-    font-size: 7px;
-    letter-spacing: 1px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 8px;
+    letter-spacing: 2px;
     text-transform: uppercase;
-    color: #fff;
-    background: rgba(0,0,0,0.6);
-    padding: 1px 4px;
-    border-radius: 3px;
-    font-family: 'Helvetica Neue', sans-serif;
-  }
-
-  .scene-name {
-    font-size: 9px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--muted);
-    font-family: 'Helvetica Neue', sans-serif;
-    max-width: 64px;
-    text-align: center;
+    color: rgba(245,240,232,0.25);
+    align-self: center;
+    padding: 0 2px;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
-  .scene-btn.active .scene-name { color: var(--gold); }
 
-  /* ── CHATBOT ── */
-  #chat-fab {
-    position: absolute;
-    bottom: calc(12px + var(--safe-bottom));
-    right: 14px;
-    width: 50px; height: 50px;
-    background: var(--dark2);
-    border: 1.5px solid var(--gold-dim);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 20px;
+  .scene-pill-btn {
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    background: var(--pill-bg);
+    border: 1px solid var(--pill-border);
+    border-radius: 50px;
+    padding: 8px 16px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 11.5px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    color: rgba(245,240,232,0.65);
     cursor: pointer;
-    z-index: 100;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.6);
-    transition: background 0.15s, transform 0.15s;
-    /* Offset from scene nav */
-    bottom: calc(84px + var(--safe-bottom));
+    white-space: nowrap;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.15s;
   }
-  #chat-fab:active { transform: scale(0.92); background: rgba(201,168,76,0.15); }
+  .scene-pill-btn.active {
+    background: rgba(200,169,110,0.15);
+    border-color: rgba(200,169,110,0.55);
+    color: var(--gold-light);
+  }
+  .scene-pill-btn:active { transform: scale(0.94); }
+
+  /* Quick action chips */
+  #quick-actions {
+    display: flex;
+    overflow-x: auto;
+    gap: 7px;
+    padding: 0 14px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  #quick-actions::-webkit-scrollbar { display: none; }
+
+  .action-chip {
+    flex-shrink: 0;
+    background: var(--pill-bg);
+    border: 1px solid var(--pill-border);
+    border-radius: 50px;
+    padding: 7px 14px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 11px;
+    font-weight: 300;
+    letter-spacing: 0.3px;
+    color: rgba(245,240,232,0.55);
+    cursor: pointer;
+    white-space: nowrap;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+  }
+  .action-chip .chip-icon { font-size: 12px; opacity: 0.7; }
+  .action-chip:active { background: rgba(255,255,255,0.08); color: var(--text); }
+
+  /* Chat input bar */
+  #chat-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 14px;
+    background: var(--pill-bg);
+    border: 1px solid var(--pill-border);
+    border-radius: 50px;
+    padding: 9px 10px 9px 18px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    cursor: pointer;
+  }
+
+  #chat-bar-text {
+    flex: 1;
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    font-weight: 300;
+    color: rgba(245,240,232,0.35);
+    letter-spacing: 0.2px;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .bar-action-btn {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    color: rgba(245,240,232,0.5);
+    flex-shrink: 0;
+    transition: background 0.15s;
+    cursor: pointer;
+  }
+  .bar-action-btn.send {
+    background: rgba(200,169,110,0.18);
+    border-color: rgba(200,169,110,0.4);
+    color: var(--gold);
+  }
+  .bar-action-btn:active { background: rgba(200,169,110,0.25); }
+
+  /* ── CHAT PANEL (slide-up drawer) ── */
+  #chat-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 140;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+  }
+  #chat-backdrop.visible { opacity: 1; pointer-events: all; }
 
   #chat-drawer {
-    position: absolute;
-    inset: 0;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
     z-index: 150;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
-    pointer-events: none;
-  }
-
-  #chat-panel {
-    background: var(--dark2);
-    border-top: 1px solid rgba(201,168,76,0.25);
-    border-radius: 18px 18px 0 0;
-    display: flex;
-    flex-direction: column;
-    max-height: 72vh;
+    max-height: 78vh;
+    background: rgba(14,13,12,0.96);
+    border: 1px solid rgba(200,169,110,0.15);
+    border-bottom: none;
+    border-radius: 22px 22px 0 0;
     transform: translateY(100%);
-    transition: transform 0.35s cubic-bezier(0.32,0,0.15,1);
-    pointer-events: all;
+    transition: transform 0.38s cubic-bezier(0.32,0,0.15,1);
     overflow: hidden;
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
   }
-  #chat-panel.open { transform: translateY(0); }
+  #chat-drawer.open { transform: translateY(0); }
 
-  .chat-drag-handle {
-    width: 36px; height: 4px;
-    background: rgba(201,168,76,0.3);
+  .chat-drag {
+    width: 32px; height: 3px;
+    background: rgba(200,169,110,0.25);
     border-radius: 2px;
-    margin: 10px auto 4px;
+    margin: 12px auto 6px;
     flex-shrink: 0;
   }
 
-  .chat-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 16px 12px;
+  .chat-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 6px 18px 14px;
     flex-shrink: 0;
-    border-bottom: 1px solid rgba(201,168,76,0.15);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
   }
-  .chat-icon { font-size: 16px; }
-  .chat-title {
-    font-size: 11px;
-    letter-spacing: 2.5px;
-    text-transform: uppercase;
-    color: var(--gold);
-    font-family: 'Helvetica Neue', sans-serif;
+
+  .chat-avatar {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(200,169,110,0.3), rgba(200,169,110,0.1));
+    border: 1px solid rgba(200,169,110,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
   }
-  .chat-close {
-    margin-left: auto;
-    background: none; border: none;
-    color: var(--muted); font-size: 20px;
-    cursor: pointer; padding: 4px;
+
+  .chat-head-info { flex: 1; }
+  .chat-head-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    font-weight: 400;
+    letter-spacing: 1px;
+    color: var(--text);
+  }
+  .chat-head-status {
+    font-family: 'Outfit', sans-serif;
+    font-size: 10px;
+    color: rgba(200,169,110,0.6);
+    letter-spacing: 0.5px;
+  }
+
+  .chat-close-btn {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 50%;
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted);
+    font-size: 16px;
+    cursor: pointer;
     line-height: 1;
   }
 
   .chat-body {
     flex: 1;
     overflow-y: auto;
-    overflow-x: hidden;
-    padding: 14px 14px 8px;
+    padding: 16px 16px 8px;
     display: flex;
     flex-direction: column;
     gap: 10px;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
+    scrollbar-width: none;
   }
   .chat-body::-webkit-scrollbar { display: none; }
 
   .msg {
-    max-width: 88%;
-    padding: 10px 13px;
-    border-radius: 14px;
+    max-width: 86%;
+    padding: 11px 14px;
+    font-family: 'Outfit', sans-serif;
     font-size: 13.5px;
-    line-height: 1.5;
-    font-family: 'Helvetica Neue', sans-serif;
+    line-height: 1.55;
+    border-radius: 16px;
   }
   .msg.bot {
-    background: var(--dark3);
-    border: 1px solid rgba(201,168,76,0.12);
-    color: var(--text);
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    color: rgba(245,240,232,0.85);
     align-self: flex-start;
-    border-radius: 4px 14px 14px 14px;
+    border-radius: 4px 16px 16px 16px;
   }
   .msg.user {
-    background: rgba(201,168,76,0.14);
-    border: 1px solid rgba(201,168,76,0.28);
+    background: rgba(200,169,110,0.13);
+    border: 1px solid rgba(200,169,110,0.25);
     color: var(--text);
     align-self: flex-end;
-    border-radius: 14px 4px 14px 14px;
+    border-radius: 16px 4px 16px 16px;
   }
   .msg.thinking {
-    background: var(--dark3);
+    background: rgba(255,255,255,0.03);
     color: var(--muted);
     align-self: flex-start;
     font-style: italic;
-    border-radius: 4px 14px 14px 14px;
     font-size: 12px;
+    border-radius: 4px 16px 16px 16px;
   }
 
   .quick-qs {
@@ -359,38 +514,39 @@
     margin-top: 2px;
   }
   .quick-q {
-    font-family: 'Helvetica Neue', sans-serif;
-    font-size: 12px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 11.5px;
     background: transparent;
-    border: 1px solid rgba(201,168,76,0.3);
-    color: #d4b96a;
-    padding: 6px 12px;
+    border: 1px solid rgba(200,169,110,0.25);
+    color: rgba(200,169,110,0.8);
+    padding: 7px 13px;
     border-radius: 20px;
     cursor: pointer;
     text-align: left;
     transition: background 0.15s;
+    font-weight: 300;
   }
-  .quick-q:active { background: rgba(201,168,76,0.15); }
+  .quick-q:active { background: rgba(200,169,110,0.12); }
 
   .chat-input-row {
     display: flex;
     gap: 8px;
     padding: 10px 12px;
     padding-bottom: calc(10px + var(--safe-bottom));
-    border-top: 1px solid rgba(201,168,76,0.12);
+    border-top: 1px solid rgba(255,255,255,0.05);
     flex-shrink: 0;
-    background: var(--dark2);
   }
 
   #chat-input {
     flex: 1;
-    background: var(--dark3);
-    border: 1px solid rgba(201,168,76,0.25);
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(200,169,110,0.2);
     border-radius: 22px;
-    padding: 10px 15px;
-    font-size: 14px;
+    padding: 10px 16px;
+    font-size: 13.5px;
     color: var(--text);
-    font-family: 'Helvetica Neue', sans-serif;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 300;
     outline: none;
     -webkit-appearance: none;
   }
@@ -398,93 +554,115 @@
 
   #send-btn {
     width: 40px; height: 40px;
-    background: rgba(201,168,76,0.18);
-    border: 1px solid rgba(201,168,76,0.4);
+    background: rgba(200,169,110,0.16);
+    border: 1px solid rgba(200,169,110,0.38);
     border-radius: 50%;
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     color: var(--gold);
-    font-size: 16px;
+    font-size: 15px;
     flex-shrink: 0;
     transition: background 0.15s;
   }
-  #send-btn:active { background: rgba(201,168,76,0.35); }
+  #send-btn:active { background: rgba(200,169,110,0.3); }
 
-  /* Backdrop */
-  #chat-backdrop {
+  /* Subtle vignette over viewer */
+  #viewer-wrap::after {
+    content: '';
     position: absolute;
     inset: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 140;
-    opacity: 0;
     pointer-events: none;
-    transition: opacity 0.3s;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.35) 100%);
+    z-index: 5;
   }
-  #chat-backdrop.visible { opacity: 1; pointer-events: all; }
 </style>
 </head>
 <body>
 
 <div id="app">
 
-  <header>
-    <div class="logo">
-      The Collection
-      <small>New Kalyani Nagar · Pune</small>
-    </div>
-    <div class="scene-label">
-      <strong id="scene-name-display">Exterior 1</strong>
-      360° Virtual Tour
-    </div>
-  </header>
-
+  <!-- ── VIEWER ── -->
   <div id="viewer-wrap">
     <div id="pano-a" style="position:absolute;inset:0;transition:opacity 0.6s ease;"></div>
     <div id="pano-b" style="position:absolute;inset:0;opacity:0;transition:opacity 0.6s ease;"></div>
+
     <div id="load-overlay">
-      <div class="load-spinner"></div>
-      <div class="load-text">Loading scene…</div>
+      <div class="load-ring"></div>
+      <div class="load-wordmark">The Collection</div>
     </div>
-    <div id="quality-badge">25%</div>
-    <button id="chat-fab" onclick="openChat()" aria-label="Open assistant">💬</button>
   </div>
 
-  <div id="scene-nav" role="list" aria-label="Scenes"></div>
+  <!-- ── TOP BAR ── -->
+  <div id="top-bar">
+    <div class="logo-block">
+      <div class="logo-eyebrow">360° Virtual Tour</div>
+      <div class="logo-name">The Collection</div>
+      <div class="logo-sub">New Kalyani Nagar · Pune</div>
+    </div>
+    <div class="top-right">
+      <div id="quality-badge">25%</div>
+    </div>
+  </div>
+
+  <!-- ── SCENE NAME (brief show on switch) ── -->
+  <div id="scene-pill">
+    <div class="scene-pill-group" id="scene-group-display">Exterior</div>
+    <div class="scene-pill-name" id="scene-name-display">Exterior 1</div>
+  </div>
+
+  <!-- ── BOTTOM UI ── -->
+  <div id="bottom-ui">
+    <!-- Quick actions -->
+    <div id="quick-actions">
+      <div class="action-chip" onclick="openChatWithQ('Send an inquiry')"><span class="chip-icon">✦</span> Send inquiry</div>
+      <div class="action-chip" onclick="openChatWithQ('Tell me about the location and amenities')"><span class="chip-icon">◎</span> Location & amenities</div>
+      <div class="action-chip" onclick="openChatWithQ('What brands are here?')"><span class="chip-icon">◈</span> About brands</div>
+      <div class="action-chip" onclick="openChatWithQ('What are the pricing and leasing details?')"><span class="chip-icon">◇</span> Pricing</div>
+    </div>
+
+    <!-- Scene nav pills -->
+    <div id="scene-nav" role="list" aria-label="Scenes"></div>
+
+    <!-- Chat input bar -->
+    <div id="chat-bar" onclick="openChat()">
+      <span id="chat-bar-text">Ask about this property…</span>
+      <div class="bar-action-btn">🎤</div>
+      <div class="bar-action-btn send">➤</div>
+    </div>
+  </div>
 </div>
 
-<!-- Chat -->
-<div id="chat-drawer">
-  <div id="chat-backdrop" onclick="closeChat()"></div>
-  <div id="chat-panel" role="dialog" aria-label="Virtual Tour Assistant">
-    <div class="chat-drag-handle"></div>
-    <div class="chat-header">
-      <span class="chat-icon">✦</span>
-      <span class="chat-title">Ask Our Assistant</span>
-      <button class="chat-close" onclick="closeChat()" aria-label="Close">×</button>
+<!-- ── CHAT DRAWER ── -->
+<div id="chat-backdrop" onclick="closeChat()"></div>
+<div id="chat-drawer" role="dialog" aria-label="Property Assistant">
+  <div class="chat-drag" id="chat-drag-handle"></div>
+  <div class="chat-head">
+    <div class="chat-avatar">✦</div>
+    <div class="chat-head-info">
+      <div class="chat-head-name">Property Assistant</div>
+      <div class="chat-head-status">The Collection · Online</div>
     </div>
-    <div class="chat-body" id="chat-body"></div>
-    <div class="chat-input-row">
-      <input id="chat-input" type="text" inputmode="text" placeholder="Ask about this property…" autocomplete="off" autocorrect="off">
-      <button id="send-btn" onclick="sendMsg()" aria-label="Send">➤</button>
-    </div>
+    <div class="chat-close-btn" onclick="closeChat()">×</div>
+  </div>
+  <div class="chat-body" id="chat-body"></div>
+  <div class="chat-input-row">
+    <input id="chat-input" type="text" inputmode="text" placeholder="Ask about this property…" autocomplete="off" autocorrect="off">
+    <button id="send-btn" onclick="sendMsg()" aria-label="Send">➤</button>
   </div>
 </div>
 
 <script>
 // ═══════════════════════════════════════════
 // SCENE DEFINITIONS
-// Hotspot connections define which scenes link
-// to which — edit these to match your layout
 // ═══════════════════════════════════════════
 const SCENES = [
-  // ── Exterior ──
   {
     id: "ext1", group: "Exterior", name: "Exterior 1",
     low:  "images/exterior/1/low.png",
     med:  "images/exterior/1/med.png",
     high: "images/exterior/1/high.jpg",
     hotspots: [
-      { pitch: -5, yaw: 60,  text: "Exterior 2", target: "ext2" },
+      { pitch: -7.5, yaw: 70.3, text: "Exterior 2", target: "ext2" },
     ]
   },
   {
@@ -493,8 +671,8 @@ const SCENES = [
     med:  "images/exterior/2/med.png",
     high: "images/exterior/2/high.jpg",
     hotspots: [
-      { pitch: -5, yaw: -60, text: "Exterior 1", target: "ext1" },
-      { pitch: -5, yaw: 60,  text: "Exterior 3", target: "ext3" },
+      { pitch: -7.4, yaw: 83.8, text: "Exterior 1", target: "ext1" },
+      { pitch: -3.0, yaw: 264.5, text: "Exterior 3", target: "ext3" }
     ]
   },
   {
@@ -503,18 +681,18 @@ const SCENES = [
     med:  "images/exterior/3/med.png",
     high: "images/exterior/3/high.jpg",
     hotspots: [
-      { pitch: -5, yaw: -60, text: "Exterior 2", target: "ext2" },
-      { pitch: -5, yaw: 0,   text: "Interior 1", target: "int1" },
+      { pitch: 0, yaw: 35.0, text: "Interior 2", target: "int2" },
+      { pitch: -8.1, yaw: 227.8, text: "Exterior 2", target: "ext2" }
     ]
   },
-  // ── Interior ──
   {
     id: "int1", group: "Interior", name: "Interior 1",
     low:  "images/interior/1/low.jpg",
     med:  "images/interior/1/med.jpg",
     high: "images/interior/1/high.jpg",
     hotspots: [
-      { pitch: -5, yaw: 60,  text: "Interior 2", target: "int2" },
+      { pitch: -6.0, yaw: 29.8, text: "Interior 2", target: "int2" },
+      { pitch: -13.3, yaw: 144.6, text: "Interior 4", target: "int4" }
     ]
   },
   {
@@ -523,8 +701,8 @@ const SCENES = [
     med:  "images/interior/2/med.jpg",
     high: "images/interior/2/high.jpg",
     hotspots: [
-      { pitch: -5, yaw: -60, text: "Interior 1", target: "int1" },
-      { pitch: -5, yaw: 60,  text: "Interior 3", target: "int3" },
+      { pitch: -12.3, yaw: 238.9, text: "Interior 1", target: "int1" },
+      { pitch: -4.4, yaw: 335.5, text: "Interior 7", target: "int7" },
     ]
   },
   {
@@ -533,8 +711,8 @@ const SCENES = [
     med:  "images/interior/3/med.jpg",
     high: "images/interior/3/high.jpg",
     hotspots: [
-      { pitch: -5, yaw: -60, text: "Interior 2", target: "int2" },
-      { pitch: -5, yaw: 60,  text: "Interior 4", target: "int4" },
+      { pitch: -18.4, yaw: 296.7, text: "Interior 8", target: "int8" },
+      { pitch: -8.8, yaw: 275.5, text: "Interior 7", target: "int7" },
     ]
   },
   {
@@ -543,8 +721,7 @@ const SCENES = [
     med:  "images/interior/4/med.jpg",
     high: "images/interior/4/high.jpg",
     hotspots: [
-      { pitch: -5, yaw: -60, text: "Interior 3", target: "int3" },
-      { pitch: -5, yaw: 60,  text: "Interior 5", target: "int5" },
+      { pitch: -12.7, yaw: 184.6, text: "Interior 1", target: "int1" },
     ]
   },
   {
@@ -553,8 +730,7 @@ const SCENES = [
     med:  "images/interior/5/med.jpg",
     high: "images/interior/5/high.jpg",
     hotspots: [
-      { pitch: -5, yaw: -60, text: "Interior 4", target: "int4" },
-      { pitch: -5, yaw: 60,  text: "Interior 6", target: "int6" },
+      { pitch: -12.0, yaw: 296.6, text: "Interior 7", target: "int7" },
     ]
   },
   {
@@ -563,8 +739,7 @@ const SCENES = [
     med:  "images/interior/6/med.jpg",
     high: "images/interior/6/high.jpg",
     hotspots: [
-      { pitch: -5, yaw: -60, text: "Interior 5", target: "int5" },
-      { pitch: -5, yaw: 60,  text: "Interior 7", target: "int7" },
+      { pitch: -2.6, yaw: 182.4, text: "Interior 7", target: "int7" },
     ]
   },
   {
@@ -573,8 +748,10 @@ const SCENES = [
     med:  "images/interior/7/med.jpg",
     high: "images/interior/7/high.jpg",
     hotspots: [
-      { pitch: -5, yaw: -60, text: "Interior 6", target: "int6" },
-      { pitch: -5, yaw: 60,  text: "Interior 8", target: "int8" },
+      { pitch: -9.2, yaw: 344.4, text: "Interior 2", target: "int2" },
+      { pitch: -1.0, yaw: 2.5,   text: "Interior 5", target: "int5" },
+      { pitch: -9.2, yaw: 184.2, text: "Interior 6", target: "int6" },
+      { pitch: -13.1, yaw: 205.0, text: "Interior 3", target: "int3" }
     ]
   },
   {
@@ -583,13 +760,13 @@ const SCENES = [
     med:  "images/interior/8/med.jpg",
     high: "images/interior/8/high.jpg",
     hotspots: [
-      { pitch: -5, yaw: -60, text: "Interior 7", target: "int7" },
+      { pitch: -7.0, yaw: 181.3, text: "Interior 3", target: "int3" },
     ]
   },
 ];
 
 // ═══════════════════════════════════════════
-// Q&A DATABASE — edit for your property
+// Q&A DATABASE
 // ═══════════════════════════════════════════
 const QA = [
   {
@@ -609,7 +786,7 @@ const QA = [
     ans: "Shop sizes range from 300 sq ft boutique units up to 3,000+ sq ft anchor stores, designed for maximum visibility and footfall."
   },
   {
-    keys: ["book","booking","rent","lease","available","contact","enquire","enquiry","interest"],
+    keys: ["book","booking","rent","lease","available","contact","enquire","enquiry","interest","inquiry","send"],
     ans: "To enquire about leasing, email leasing@thecollectionpune.com or call +91 20 XXXX XXXX. Our team responds within 24 hours."
   },
   {
@@ -634,7 +811,7 @@ const QA = [
   },
   {
     keys: ["tour","virtual","360","navigate","how to","view","look around"],
-    ans: "Drag or swipe to look around. Tap the glowing arrow hotspots to move between spaces. Use the thumbnail strip at the bottom to jump to any scene."
+    ans: "Drag or swipe to look around. Tap the glowing arrow hotspots to move between spaces. Use the pill buttons at the bottom to jump to any scene."
   },
   {
     keys: ["developer","builder","promoter","owner","who built","developed by"],
@@ -647,9 +824,15 @@ const FALLBACK = "I can only answer questions about The Collection — its locat
 // ═══════════════════════════════════════════
 // PANNELLUM VIEWER + PROGRESSIVE LOADING
 // ═══════════════════════════════════════════
-let viewer = null; // kept for compatibility but unused directly — use viewers{} instead
 let currentScene = null;
-let loadStage = 0;
+let activeId = 'a';
+let viewers = { a: null, b: null };
+let scenePillTimer = null;
+
+function activeViewer()   { return viewers[activeId]; }
+function inactiveId()     { return activeId === 'a' ? 'b' : 'a'; }
+function inactiveViewer() { return viewers[inactiveId()]; }
+function panoEl(id)       { return document.getElementById('pano-' + id); }
 
 function buildHotspots(scene) {
   return scene.hotspots.map(h => ({
@@ -672,20 +855,33 @@ function setQualityBadge(label) {
   b.style.opacity = '1';
 }
 
-// ── Dual-buffer crossfade viewer ──
-// Two pannellum divs (pano-a, pano-b) are always alive.
-// "active" is the visible one the user is interacting with.
-// When upgrading quality: load into the inactive div at the same
-// pitch/yaw/hfov, then crossfade opacity. No WebGL restart on the
-// active viewer = zero stutter.
+function showScenePill(scene) {
+  document.getElementById('scene-name-display').textContent = scene.name;
+  document.getElementById('scene-group-display').textContent = scene.group;
+  const pill = document.getElementById('scene-pill');
+  pill.classList.add('show');
+  clearTimeout(scenePillTimer);
+  scenePillTimer = setTimeout(() => pill.classList.remove('show'), 2200);
+}
 
-let activeId = 'a';          // which pano div is currently shown
-let viewers = { a: null, b: null };
+// Detect max WebGL texture size once at startup
+const MAX_TEX = (() => {
+  try {
+    const c = document.createElement('canvas');
+    const gl = c.getContext('webgl') || c.getContext('experimental-webgl');
+    return gl ? gl.getParameter(gl.MAX_TEXTURE_SIZE) : 4096;
+  } catch(e) { return 4096; }
+})();
 
-function activeViewer()   { return viewers[activeId]; }
-function inactiveId()     { return activeId === 'a' ? 'b' : 'a'; }
-function inactiveViewer() { return viewers[inactiveId()]; }
-function panoEl(id)       { return document.getElementById('pano-' + id); }
+// Given an image URL, resolve its natural width without adding to DOM
+function getImageWidth(url) {
+  return new Promise(res => {
+    const i = new Image();
+    i.onload = () => res(i.naturalWidth);
+    i.onerror = () => res(0);
+    i.src = url;
+  });
+}
 
 function makeViewer(divId, panorama, opts = {}) {
   const el = panoEl(divId);
@@ -708,7 +904,6 @@ function makeViewer(divId, panorama, opts = {}) {
   return viewers[divId];
 }
 
-// Crossfade: load nextUrl into inactive buffer, then swap
 function crossfade(scene, nextUrl, onDone) {
   if (currentScene?.id !== scene.id) return;
   const av = activeViewer();
@@ -721,43 +916,34 @@ function crossfade(scene, nextUrl, onDone) {
 
   v.on('load', () => {
     if (currentScene?.id !== scene.id) return;
-
-    // Sync position one more time (user may have panned while loading)
     const av2 = activeViewer();
     if (av2) { try { v.setYaw(av2.getYaw()); v.setPitch(av2.getPitch()); } catch(e){} }
-
-    // Fade inactive (next) in, active out simultaneously
     panoEl(nextId).style.opacity = '1';
     panoEl(nextId).style.pointerEvents = 'auto';
     panoEl(activeId).style.opacity = '0';
     panoEl(activeId).style.pointerEvents = 'none';
-
-    // After transition, clean up the now-hidden old viewer
     setTimeout(() => {
       if (currentScene?.id !== scene.id) return;
       const oldId = activeId;
-      activeId = nextId;          // promote next → active
-      // Destroy old viewer to free GPU memory
+      activeId = nextId;
       if (viewers[oldId]) { try { viewers[oldId].destroy(); } catch(e){} viewers[oldId] = null; }
       onDone();
-    }, 650); // slightly longer than the 0.6s CSS transition
+    }, 650);
   });
-
-  v.on('error', () => { /* silently ignore, user keeps seeing current quality */ });
+  v.on('error', () => {});
 }
 
 async function loadScene(scene) {
   if (currentScene?.id === scene.id) return;
   currentScene = scene;
 
-  document.getElementById('scene-name-display').textContent = scene.name;
-  document.querySelectorAll('.scene-btn').forEach(b => b.classList.toggle('active', b.dataset.id === scene.id));
+  showScenePill(scene);
+  document.querySelectorAll('.scene-pill-btn').forEach(b => b.classList.toggle('active', b.dataset.id === scene.id));
 
   showOverlay(true);
   setQualityBadge('25%');
   document.getElementById('quality-badge').style.opacity = '1';
 
-  // Destroy both viewers for a clean scene switch
   ['a','b'].forEach(id => {
     if (viewers[id]) { try { viewers[id].destroy(); } catch(e){} viewers[id] = null; }
     panoEl(id).style.opacity = '0';
@@ -765,7 +951,6 @@ async function loadScene(scene) {
   });
   activeId = 'a';
 
-  // Load low quality into active buffer
   const v = makeViewer('a', scene.low, { hotSpots: buildHotspots(scene) });
   panoEl('a').style.opacity = '1';
   panoEl('a').style.pointerEvents = 'auto';
@@ -773,7 +958,6 @@ async function loadScene(scene) {
   v.on('load', () => {
     showOverlay(false);
     setQualityBadge('25%');
-    // Kick off background loads
     loadQuality(scene, scene.med,  '50%', () =>
       loadQuality(scene, scene.high, 'HD',  () => {
         setTimeout(() => { document.getElementById('quality-badge').style.opacity = '0'; }, 2000);
@@ -785,10 +969,17 @@ async function loadScene(scene) {
 
 function loadQuality(scene, url, label, onDone) {
   if (currentScene?.id !== scene.id) return;
-  // Preload image first so crossfade is instant once it arrives
   const img = new Image();
-  img.onload = () => crossfade(scene, url, () => { setQualityBadge(label); onDone(); });
-  img.onerror = onDone; // skip this quality level on error
+  img.onload = () => {
+    // Skip if image exceeds GPU texture limit — avoids WebGL error
+    if (img.naturalWidth > MAX_TEX) {
+      console.warn(`Skipping ${label}: image ${img.naturalWidth}px > GPU max ${MAX_TEX}px`);
+      onDone();
+      return;
+    }
+    crossfade(scene, url, () => { setQualityBadge(label); onDone(); });
+  };
+  img.onerror = onDone;
   img.src = url;
 }
 
@@ -798,7 +989,7 @@ function goToScene(id) {
 }
 
 // ═══════════════════════════════════════════
-// SCENE NAV STRIP
+// SCENE NAV (pill buttons)
 // ═══════════════════════════════════════════
 function buildNav() {
   const nav = document.getElementById('scene-nav');
@@ -806,27 +997,25 @@ function buildNav() {
 
   SCENES.forEach(scene => {
     if (scene.group !== lastGroup) {
-      const sep = document.createElement('div');
-      sep.style.cssText = 'flex-shrink:0;display:flex;align-items:center;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-family:"Helvetica Neue",sans-serif;writing-mode:vertical-rl;text-orientation:mixed;padding:0 2px;';
-      sep.textContent = scene.group;
-      nav.appendChild(sep);
+      if (lastGroup !== null) {
+        const sep = document.createElement('div');
+        sep.style.cssText = 'flex-shrink:0;width:1px;background:rgba(255,255,255,0.1);align-self:stretch;margin:6px 2px;';
+        nav.appendChild(sep);
+      }
+      const label = document.createElement('div');
+      label.className = 'nav-group-label';
+      label.textContent = scene.group;
+      nav.appendChild(label);
       lastGroup = scene.group;
     }
 
     const btn = document.createElement('button');
-    btn.className = 'scene-btn';
+    btn.className = 'scene-pill-btn';
     btn.dataset.id = scene.id;
     btn.setAttribute('role', 'listitem');
     btn.setAttribute('aria-label', scene.name);
+    btn.textContent = scene.name;
     btn.onclick = () => loadScene(scene);
-
-    btn.innerHTML = `
-      <div class="scene-thumb">
-        <img src="${scene.low}" alt="${scene.name}" loading="lazy">
-        <div class="scene-thumb-tag">${scene.group === 'Exterior' ? 'EXT' : 'INT'}</div>
-      </div>
-      <span class="scene-name">${scene.name}</span>
-    `;
     nav.appendChild(btn);
   });
 }
@@ -838,30 +1027,31 @@ let chatOpen = false;
 
 function openChat() {
   chatOpen = true;
-  document.getElementById('chat-panel').classList.add('open');
+  document.getElementById('chat-drawer').classList.add('open');
   document.getElementById('chat-backdrop').classList.add('visible');
-  // Auto-focus input after animation
-  setTimeout(() => document.getElementById('chat-input').focus(), 380);
+  setTimeout(() => document.getElementById('chat-input').focus(), 400);
+}
+
+function openChatWithQ(q) {
+  openChat();
+  setTimeout(() => askQ(q), 450);
 }
 
 function closeChat() {
   chatOpen = false;
-  document.getElementById('chat-panel').classList.remove('open');
+  document.getElementById('chat-drawer').classList.remove('open');
   document.getElementById('chat-backdrop').classList.remove('visible');
   document.getElementById('chat-input').blur();
 }
 
-// Close on swipe down
+// Swipe down to close
 let dragStart = null;
-document.getElementById('chat-panel').addEventListener('touchstart', e => {
-  dragStart = e.touches[0].clientY;
-}, { passive: true });
-document.getElementById('chat-panel').addEventListener('touchmove', e => {
+document.getElementById('chat-drawer').addEventListener('touchstart', e => { dragStart = e.touches[0].clientY; }, { passive: true });
+document.getElementById('chat-drawer').addEventListener('touchmove', e => {
   if (!dragStart) return;
-  const dy = e.touches[0].clientY - dragStart;
-  if (dy > 60) { closeChat(); dragStart = null; }
+  if (e.touches[0].clientY - dragStart > 65) { closeChat(); dragStart = null; }
 }, { passive: true });
-document.getElementById('chat-panel').addEventListener('touchend', () => { dragStart = null; }, { passive: true });
+document.getElementById('chat-drawer').addEventListener('touchend', () => { dragStart = null; }, { passive: true });
 
 function appendMsg(text, role) {
   const body = document.getElementById('chat-body');
@@ -938,13 +1128,12 @@ document.getElementById('chat-input').addEventListener('keydown', e => {
   if (e.key === 'Enter') { e.preventDefault(); sendMsg(); }
 });
 
-// Init chat with welcome message + quick questions
 function initChat() {
-  appendMsg('Welcome to The Collection! I can answer questions about this property. Try asking:', 'bot');
-  const qs = document.getElementById('chat-body');
+  appendMsg('Welcome to The Collection. How can I help you today?', 'bot');
+  const body = document.getElementById('chat-body');
   const wrap = document.createElement('div');
   wrap.className = 'quick-qs';
-  ['What brands are here?','Where is it located?','Is parking available?','How do I book a space?','What are the opening hours?']
+  ['What brands are here?', 'Where is it located?', 'Is parking available?', 'How do I book a space?', 'What are the opening hours?']
     .forEach(q => {
       const btn = document.createElement('button');
       btn.className = 'quick-q';
@@ -952,7 +1141,89 @@ function initChat() {
       btn.onclick = () => askQ(q);
       wrap.appendChild(btn);
     });
-  qs.appendChild(wrap);
+  body.appendChild(wrap);
+}
+
+// ═══════════════════════════════════════════
+// DEV MODE — coordinate picker
+// Triple-tap the viewer (mobile) or press D (desktop) to toggle.
+// When active, clicking/tapping logs pitch & yaw to console AND
+// shows a floating readout on screen so you can copy hotspot coords.
+// ═══════════════════════════════════════════
+let devMode = false;
+let devTapCount = 0, devTapTimer = null;
+
+const devBadge = document.createElement('div');
+devBadge.id = 'dev-badge';
+devBadge.style.cssText = `
+  position:fixed; top:60px; left:50%; transform:translateX(-50%);
+  background:rgba(255,80,80,0.92); color:#fff;
+  font-family:'Outfit',sans-serif; font-size:11px; letter-spacing:2px;
+  text-transform:uppercase; padding:5px 14px; border-radius:20px;
+  z-index:999; display:none; pointer-events:none;
+  box-shadow:0 2px 10px rgba(0,0,0,0.5);
+`;
+devBadge.textContent = '⌖ DEV MODE — tap to log coords';
+document.body.appendChild(devBadge);
+
+const devReadout = document.createElement('div');
+devReadout.id = 'dev-readout';
+devReadout.style.cssText = `
+  position:fixed; bottom:160px; left:50%; transform:translateX(-50%);
+  background:rgba(0,0,0,0.88); color:#fff;
+  font-family:'Outfit',sans-serif; font-size:12px; letter-spacing:1px;
+  padding:8px 16px; border-radius:10px; z-index:999;
+  display:none; pointer-events:none; text-align:center;
+  border:1px solid rgba(255,80,80,0.5);
+`;
+document.body.appendChild(devReadout);
+
+function toggleDevMode() {
+  devMode = !devMode;
+  devBadge.style.display = devMode ? 'block' : 'none';
+  devReadout.style.display = 'none';
+  console.log(`%c[DEV] Coordinate picker ${devMode ? 'ON' : 'OFF'}`, 'color:tomato;font-weight:bold');
+}
+
+// Desktop: press D to toggle dev mode
+document.addEventListener('keydown', e => {
+  if (e.key === 'd' || e.key === 'D') toggleDevMode();
+});
+
+// Mobile: triple-tap the viewer within 600ms
+document.getElementById('viewer-wrap').addEventListener('touchend', e => {
+  if (!devMode) {
+    devTapCount++;
+    clearTimeout(devTapTimer);
+    devTapTimer = setTimeout(() => { devTapCount = 0; }, 600);
+    if (devTapCount >= 3) { devTapCount = 0; toggleDevMode(); }
+    return;
+  }
+  // Dev mode is ON — log the tapped coord
+  logCoord(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+}, { passive: true });
+
+// Desktop: click to log coord when dev mode is on
+document.getElementById('viewer-wrap').addEventListener('click', e => {
+  if (!devMode) return;
+  logCoord(e.clientX, e.clientY);
+});
+
+function logCoord(clientX, clientY) {
+  const av = activeViewer();
+  if (!av) return;
+  try {
+    const coords = av.mouseEventToCoords({ clientX, clientY });
+    const pitch = coords[0].toFixed(2);
+    const yaw   = coords[1].toFixed(2);
+    const msg = `pitch: ${pitch},  yaw: ${yaw}`;
+    console.log(`%c[DEV] ${msg}`, 'color:tomato');
+    devReadout.textContent = msg;
+    devReadout.style.display = 'block';
+    setTimeout(() => { devReadout.style.display = 'none'; }, 3000);
+  } catch(err) {
+    console.warn('[DEV] Could not read coords:', err);
+  }
 }
 
 // ═══════════════════════════════════════════
