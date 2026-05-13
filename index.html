@@ -662,7 +662,7 @@ const SCENES = [
     med:  "images/exterior/1/med.png",
     high: "images/exterior/1/high.jpg",
     hotspots: [
-      { pitch: -7.5, yaw: 70.3, text: "Exterior 2", target: "ext2" },
+      { pitch: -5, yaw: 60,  text: "Exterior 2", target: "ext2" },
     ]
   },
   {
@@ -671,8 +671,8 @@ const SCENES = [
     med:  "images/exterior/2/med.png",
     high: "images/exterior/2/high.jpg",
     hotspots: [
-      { pitch: -7.4, yaw: 83.8, text: "Exterior 1", target: "ext1" },
-      { pitch: -3.0, yaw: 264.5, text: "Exterior 3", target: "ext3" }
+      { pitch: -5, yaw: -60, text: "Exterior 1", target: "ext1" },
+      { pitch: -5, yaw: 60,  text: "Exterior 3", target: "ext3" },
     ]
   },
   {
@@ -681,8 +681,8 @@ const SCENES = [
     med:  "images/exterior/3/med.png",
     high: "images/exterior/3/high.jpg",
     hotspots: [
-      { pitch: 0, yaw: 35.0, text: "Interior 2", target: "int2" },
-      { pitch: -8.1, yaw: 227.8, text: "Exterior 2", target: "ext2" }
+      { pitch: -5, yaw: -60, text: "Exterior 2", target: "ext2" },
+      { pitch: -5, yaw: 0,   text: "Interior 1", target: "int1" },
     ]
   },
   {
@@ -691,8 +691,7 @@ const SCENES = [
     med:  "images/interior/1/med.jpg",
     high: "images/interior/1/high.jpg",
     hotspots: [
-      { pitch: -6.0, yaw: 29.8, text: "Interior 2", target: "int2" },
-      { pitch: -13.3, yaw: 144.6, text: "Interior 4", target: "int4" }
+      { pitch: -5, yaw: 60,  text: "Interior 2", target: "int2" },
     ]
   },
   {
@@ -701,8 +700,8 @@ const SCENES = [
     med:  "images/interior/2/med.jpg",
     high: "images/interior/2/high.jpg",
     hotspots: [
-      { pitch: -12.3, yaw: 238.9, text: "Interior 1", target: "int1" },
-      { pitch: -4.4, yaw: 335.5, text: "Interior 7", target: "int7" },
+      { pitch: -5, yaw: -60, text: "Interior 1", target: "int1" },
+      { pitch: -5, yaw: 60,  text: "Interior 3", target: "int3" },
     ]
   },
   {
@@ -711,8 +710,8 @@ const SCENES = [
     med:  "images/interior/3/med.jpg",
     high: "images/interior/3/high.jpg",
     hotspots: [
-      { pitch: -18.4, yaw: 296.7, text: "Interior 8", target: "int8" },
-      { pitch: -8.8, yaw: 275.5, text: "Interior 7", target: "int7" },
+      { pitch: -5, yaw: -60, text: "Interior 2", target: "int2" },
+      { pitch: -5, yaw: 60,  text: "Interior 4", target: "int4" },
     ]
   },
   {
@@ -721,7 +720,8 @@ const SCENES = [
     med:  "images/interior/4/med.jpg",
     high: "images/interior/4/high.jpg",
     hotspots: [
-      { pitch: -12.7, yaw: 184.6, text: "Interior 1", target: "int1" },
+      { pitch: -5, yaw: -60, text: "Interior 3", target: "int3" },
+      { pitch: -5, yaw: 60,  text: "Interior 5", target: "int5" },
     ]
   },
   {
@@ -730,7 +730,8 @@ const SCENES = [
     med:  "images/interior/5/med.jpg",
     high: "images/interior/5/high.jpg",
     hotspots: [
-      { pitch: -12.0, yaw: 296.6, text: "Interior 7", target: "int7" },
+      { pitch: -5, yaw: -60, text: "Interior 4", target: "int4" },
+      { pitch: -5, yaw: 60,  text: "Interior 6", target: "int6" },
     ]
   },
   {
@@ -739,7 +740,8 @@ const SCENES = [
     med:  "images/interior/6/med.jpg",
     high: "images/interior/6/high.jpg",
     hotspots: [
-      { pitch: -2.6, yaw: 182.4, text: "Interior 7", target: "int7" },
+      { pitch: -5, yaw: -60, text: "Interior 5", target: "int5" },
+      { pitch: -5, yaw: 60,  text: "Interior 7", target: "int7" },
     ]
   },
   {
@@ -748,10 +750,8 @@ const SCENES = [
     med:  "images/interior/7/med.jpg",
     high: "images/interior/7/high.jpg",
     hotspots: [
-      { pitch: -9.2, yaw: 344.4, text: "Interior 2", target: "int2" },
-      { pitch: -1.0, yaw: 2.5,   text: "Interior 5", target: "int5" },
-      { pitch: -9.2, yaw: 184.2, text: "Interior 6", target: "int6" },
-      { pitch: -13.1, yaw: 205.0, text: "Interior 3", target: "int3" }
+      { pitch: -5, yaw: -60, text: "Interior 6", target: "int6" },
+      { pitch: -5, yaw: 60,  text: "Interior 8", target: "int8" },
     ]
   },
   {
@@ -760,7 +760,7 @@ const SCENES = [
     med:  "images/interior/8/med.jpg",
     high: "images/interior/8/high.jpg",
     hotspots: [
-      { pitch: -7.0, yaw: 181.3, text: "Interior 3", target: "int3" },
+      { pitch: -5, yaw: -60, text: "Interior 7", target: "int7" },
     ]
   },
 ];
@@ -841,8 +841,40 @@ function buildHotspots(scene) {
     yaw: h.yaw,
     sceneId: h.target,
     text: h.text,
+    // Store target on the element so touch delegate can read it without text matching
+    createTooltipFunc: (hotSpotDiv) => {
+      hotSpotDiv.setAttribute('data-scene-id', h.target);
+    },
     clickHandlerFunc: () => goToScene(h.target),
   }));
+}
+
+// Mobile touch fix: delegate touchend on the active pano container.
+// pannellum's clickHandlerFunc doesn't fire on mobile; we detect a tap
+// on any .pnlm-hotspot element and fire goToScene via its sceneId attribute.
+function bindHotspotTouch(containerId) {
+  const el = panoEl(containerId);
+  if (el._hotspotDelegated) return;
+  el._hotspotDelegated = true;
+  let touchMoved = false;
+  el.addEventListener('touchstart', () => { touchMoved = false; }, { passive: true });
+  el.addEventListener('touchmove',  () => { touchMoved = true;  }, { passive: true });
+  el.addEventListener('touchend', (e) => {
+    if (touchMoved) return;
+    const hs = e.target.closest('.pnlm-hotspot');
+    if (!hs) return;
+    e.preventDefault();
+    e.stopPropagation();
+    // pannellum stores sceneId as a data attribute on the hotspot element
+    const sceneId = hs.getAttribute('data-scene-id') || hs.dataset.sceneId;
+    if (sceneId) { goToScene(sceneId); return; }
+    // fallback: match by tooltip text
+    const tip = hs.querySelector('.pnlm-tooltip span');
+    if (tip) {
+      const match = SCENES.find(s => tip.textContent.trim() === s.name);
+      if (match) goToScene(match.id);
+    }
+  }, { passive: false });
 }
 
 function showOverlay(show) {
@@ -927,6 +959,7 @@ function crossfade(scene, nextUrl, onDone) {
       const oldId = activeId;
       activeId = nextId;
       if (viewers[oldId]) { try { viewers[oldId].destroy(); } catch(e){} viewers[oldId] = null; }
+      bindHotspotTouch(activeId);
       onDone();
     }, 650);
   });
@@ -958,6 +991,7 @@ async function loadScene(scene) {
   v.on('load', () => {
     showOverlay(false);
     setQualityBadge('25%');
+    bindHotspotTouch('a');
     loadQuality(scene, scene.med,  '50%', () =>
       loadQuality(scene, scene.high, 'HD',  () => {
         setTimeout(() => { document.getElementById('quality-badge').style.opacity = '0'; }, 2000);
@@ -1190,18 +1224,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'd' || e.key === 'D') toggleDevMode();
 });
 
-// Mobile: triple-tap the viewer within 600ms
-document.getElementById('viewer-wrap').addEventListener('touchend', e => {
-  if (!devMode) {
-    devTapCount++;
-    clearTimeout(devTapTimer);
-    devTapTimer = setTimeout(() => { devTapCount = 0; }, 600);
-    if (devTapCount >= 3) { devTapCount = 0; toggleDevMode(); }
-    return;
-  }
-  // Dev mode is ON — log the tapped coord
-  logCoord(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
-}, { passive: true });
+// Dev mode coordinate picker is desktop-only (triple-tap disabled on mobile)
 
 // Desktop: click to log coord when dev mode is on
 document.getElementById('viewer-wrap').addEventListener('click', e => {
