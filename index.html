@@ -38,7 +38,6 @@
     touch-action: none;
   }
 
-  /* ── FULL-BLEED VIEWER ── */
   #app {
     position: fixed;
     inset: 0;
@@ -58,9 +57,6 @@
   .pnlm-load-box { display: none !important; }
   .pnlm-compass { display: none !important; }
   .pnlm-controls-container { display: none !important; }
-
-  /* Let pannellum render hotspots completely naturally —
-     only tint the tooltip to match our gold theme */
   .pnlm-scene { cursor: pointer !important; }
 
   .pnlm-tooltip span {
@@ -122,7 +118,7 @@
     font-weight: 300;
   }
 
-  /* ── TOP HEADER (floating) ── */
+  /* ── TOP HEADER ── */
   #top-bar {
     position: absolute;
     top: 0; left: 0; right: 0;
@@ -135,106 +131,58 @@
     background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, transparent 100%);
   }
 
-  .logo-block {
-    pointer-events: all;
-  }
+  .logo-block { pointer-events: all; }
   .logo-eyebrow {
     font-family: 'Outfit', sans-serif;
-    font-size: 8px;
-    font-weight: 400;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 3px;
-    opacity: 0.8;
+    font-size: 8px; font-weight: 400;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 3px; opacity: 0.8;
   }
   .logo-name {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 20px;
-    font-weight: 300;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    color: var(--text);
-    line-height: 1;
+    font-size: 20px; font-weight: 300;
+    letter-spacing: 4px; text-transform: uppercase;
+    color: var(--text); line-height: 1;
   }
   .logo-sub {
     font-family: 'Outfit', sans-serif;
-    font-size: 8.5px;
-    letter-spacing: 1.5px;
-    color: rgba(245,240,232,0.35);
-    margin-top: 3px;
-    text-transform: uppercase;
+    font-size: 8.5px; letter-spacing: 1.5px;
+    color: rgba(245,240,232,0.35); margin-top: 3px; text-transform: uppercase;
   }
 
   .top-right {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    pointer-events: all;
+    display: flex; align-items: center; gap: 8px; pointer-events: all;
   }
 
   #quality-badge {
     font-family: 'Outfit', sans-serif;
-    font-size: 9px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--gold);
-    background: rgba(0,0,0,0.5);
-    border: 1px solid var(--gold-dim);
-    padding: 4px 10px;
-    border-radius: 20px;
-    transition: opacity 0.4s;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--gold); background: rgba(0,0,0,0.5);
+    border: 1px solid var(--gold-dim); padding: 4px 10px; border-radius: 20px;
+    transition: opacity 0.4s; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
   }
 
-  .icon-btn {
-    width: 36px; height: 36px;
-    background: rgba(0,0,0,0.45);
-    border: 1px solid var(--pill-border);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    font-size: 15px;
-    transition: background 0.15s, transform 0.15s;
-  }
-  .icon-btn:active { transform: scale(0.9); background: rgba(200,169,110,0.15); }
-
-  /* ── SCENE NAME PILL (center floating) ── */
+  /* ── SCENE NAME PILL ── */
   #scene-pill {
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: 50%; left: 50%;
     transform: translate(-50%, calc(-50% - 60px));
     z-index: 90;
     pointer-events: none;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    opacity: 0;
-    transition: opacity 0.4s ease;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    opacity: 0; transition: opacity 0.4s ease;
   }
   #scene-pill.show { opacity: 1; }
 
   .scene-pill-name {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 28px;
-    font-weight: 300;
-    letter-spacing: 3px;
-    color: var(--text);
-    text-shadow: 0 2px 20px rgba(0,0,0,0.7);
-    white-space: nowrap;
+    font-size: 28px; font-weight: 300; letter-spacing: 3px;
+    color: var(--text); text-shadow: 0 2px 20px rgba(0,0,0,0.7); white-space: nowrap;
   }
   .scene-pill-group {
     font-family: 'Outfit', sans-serif;
-    font-size: 9px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--gold);
-    opacity: 0.7;
+    font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--gold); opacity: 0.7;
   }
 
   /* ── BOTTOM UI ── */
@@ -243,337 +191,306 @@
     bottom: 0; left: 0; right: 0;
     z-index: 100;
     padding: 0 0 calc(10px + var(--safe-bottom));
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+    display: flex; flex-direction: column; gap: 10px;
     background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 100%);
     padding-top: 40px;
   }
 
-  /* Scene nav — pill buttons */
   #scene-nav {
-    display: flex;
-    overflow-x: auto;
-    gap: 7px;
-    padding: 0 14px;
-    scrollbar-width: none;
-    scroll-snap-type: x mandatory;
+    display: flex; overflow-x: auto; gap: 7px; padding: 0 14px;
+    scrollbar-width: none; scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
   }
   #scene-nav::-webkit-scrollbar { display: none; }
 
-  /* Group label in nav */
   .nav-group-label {
     flex-shrink: 0;
     font-family: 'Outfit', sans-serif;
-    font-size: 8px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: rgba(245,240,232,0.25);
-    align-self: center;
-    padding: 0 2px;
-    white-space: nowrap;
+    font-size: 8px; letter-spacing: 2px; text-transform: uppercase;
+    color: rgba(245,240,232,0.25); align-self: center; padding: 0 2px; white-space: nowrap;
   }
 
   .scene-pill-btn {
-    flex-shrink: 0;
-    scroll-snap-align: start;
-    background: var(--pill-bg);
-    border: 1px solid var(--pill-border);
-    border-radius: 50px;
-    padding: 8px 16px;
-    font-family: 'Outfit', sans-serif;
-    font-size: 11.5px;
-    font-weight: 400;
-    letter-spacing: 0.5px;
-    color: rgba(245,240,232,0.65);
-    cursor: pointer;
-    white-space: nowrap;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    flex-shrink: 0; scroll-snap-align: start;
+    background: var(--pill-bg); border: 1px solid var(--pill-border);
+    border-radius: 50px; padding: 8px 16px;
+    font-family: 'Outfit', sans-serif; font-size: 11.5px; font-weight: 400;
+    letter-spacing: 0.5px; color: rgba(245,240,232,0.65); cursor: pointer;
+    white-space: nowrap; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
     transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.15s;
   }
   .scene-pill-btn.active {
-    background: rgba(200,169,110,0.15);
-    border-color: rgba(200,169,110,0.55);
-    color: var(--gold-light);
+    background: rgba(200,169,110,0.15); border-color: rgba(200,169,110,0.55); color: var(--gold-light);
   }
   .scene-pill-btn:active { transform: scale(0.94); }
 
-  /* Quick action chips */
   #quick-actions {
-    display: flex;
-    overflow-x: auto;
-    gap: 7px;
-    padding: 0 14px;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
+    display: flex; overflow-x: auto; gap: 7px; padding: 0 14px;
+    scrollbar-width: none; -webkit-overflow-scrolling: touch;
   }
   #quick-actions::-webkit-scrollbar { display: none; }
 
   .action-chip {
-    flex-shrink: 0;
-    background: var(--pill-bg);
-    border: 1px solid var(--pill-border);
-    border-radius: 50px;
-    padding: 7px 14px;
-    font-family: 'Outfit', sans-serif;
-    font-size: 11px;
-    font-weight: 300;
-    letter-spacing: 0.3px;
-    color: rgba(245,240,232,0.55);
-    cursor: pointer;
-    white-space: nowrap;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    flex-shrink: 0; background: var(--pill-bg);
+    border: 1px solid var(--pill-border); border-radius: 50px; padding: 7px 14px;
+    font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 300;
+    letter-spacing: 0.3px; color: rgba(245,240,232,0.55); cursor: pointer;
+    white-space: nowrap; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    display: flex; align-items: center; gap: 6px;
     transition: background 0.15s, border-color 0.15s, color 0.15s;
   }
   .action-chip .chip-icon { font-size: 12px; opacity: 0.7; }
   .action-chip:active { background: rgba(255,255,255,0.08); color: var(--text); }
 
-  /* Chat input bar */
   #chat-bar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 0 14px;
-    background: var(--pill-bg);
-    border: 1px solid var(--pill-border);
-    border-radius: 50px;
-    padding: 9px 10px 9px 18px;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    cursor: pointer;
+    display: flex; align-items: center; gap: 8px; margin: 0 14px;
+    background: var(--pill-bg); border: 1px solid var(--pill-border);
+    border-radius: 50px; padding: 9px 10px 9px 18px;
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); cursor: pointer;
   }
-
   #chat-bar-text {
-    flex: 1;
-    font-family: 'Outfit', sans-serif;
-    font-size: 13px;
-    font-weight: 300;
-    color: rgba(245,240,232,0.35);
-    letter-spacing: 0.2px;
-    pointer-events: none;
-    user-select: none;
+    flex: 1; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 300;
+    color: rgba(245,240,232,0.35); letter-spacing: 0.2px; pointer-events: none; user-select: none;
   }
 
   .bar-action-btn {
-    width: 34px; height: 34px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.1);
+    width: 34px; height: 34px; border-radius: 50%;
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
     display: flex; align-items: center; justify-content: center;
-    font-size: 14px;
-    color: rgba(245,240,232,0.5);
-    flex-shrink: 0;
-    transition: background 0.15s;
-    cursor: pointer;
+    font-size: 14px; color: rgba(245,240,232,0.5); flex-shrink: 0;
+    transition: background 0.15s; cursor: pointer;
   }
   .bar-action-btn.send {
-    background: rgba(200,169,110,0.18);
-    border-color: rgba(200,169,110,0.4);
-    color: var(--gold);
+    background: rgba(200,169,110,0.18); border-color: rgba(200,169,110,0.4); color: var(--gold);
   }
   .bar-action-btn:active { background: rgba(200,169,110,0.25); }
 
-  /* ── CHAT PANEL (slide-up drawer) ── */
+  /* ── CHAT PANEL ── */
   #chat-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
-    z-index: 140;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s;
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 140;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
   }
   #chat-backdrop.visible { opacity: 1; pointer-events: all; }
 
   #chat-drawer {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    z-index: 150;
-    display: flex;
-    flex-direction: column;
-    max-height: 78vh;
-    background: rgba(14,13,12,0.96);
-    border: 1px solid rgba(200,169,110,0.15);
-    border-bottom: none;
-    border-radius: 22px 22px 0 0;
-    transform: translateY(100%);
-    transition: transform 0.38s cubic-bezier(0.32,0,0.15,1);
-    overflow: hidden;
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 150;
+    display: flex; flex-direction: column; max-height: 78vh;
+    background: rgba(14,13,12,0.96); border: 1px solid rgba(200,169,110,0.15);
+    border-bottom: none; border-radius: 22px 22px 0 0;
+    transform: translateY(100%); transition: transform 0.38s cubic-bezier(0.32,0,0.15,1);
+    overflow: hidden; backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
   }
   #chat-drawer.open { transform: translateY(0); }
 
   .chat-drag {
-    width: 32px; height: 3px;
-    background: rgba(200,169,110,0.25);
-    border-radius: 2px;
-    margin: 12px auto 6px;
-    flex-shrink: 0;
+    width: 32px; height: 3px; background: rgba(200,169,110,0.25);
+    border-radius: 2px; margin: 12px auto 6px; flex-shrink: 0;
   }
 
   .chat-head {
     display: flex; align-items: center; gap: 10px;
-    padding: 6px 18px 14px;
-    flex-shrink: 0;
+    padding: 6px 18px 14px; flex-shrink: 0;
     border-bottom: 1px solid rgba(255,255,255,0.05);
   }
 
   .chat-avatar {
-    width: 30px; height: 30px;
-    border-radius: 50%;
+    width: 30px; height: 30px; border-radius: 50%;
     background: linear-gradient(135deg, rgba(200,169,110,0.3), rgba(200,169,110,0.1));
     border: 1px solid rgba(200,169,110,0.3);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 13px;
+    display: flex; align-items: center; justify-content: center; font-size: 13px;
   }
 
   .chat-head-info { flex: 1; }
   .chat-head-name {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 15px;
-    font-weight: 400;
-    letter-spacing: 1px;
-    color: var(--text);
+    font-family: 'Cormorant Garamond', serif; font-size: 15px;
+    font-weight: 400; letter-spacing: 1px; color: var(--text);
   }
-  .chat-head-status {
-    font-family: 'Outfit', sans-serif;
-    font-size: 10px;
-    color: rgba(200,169,110,0.6);
-    letter-spacing: 0.5px;
-  }
+  .chat-head-status { font-family: 'Outfit', sans-serif; font-size: 10px; color: rgba(200,169,110,0.6); letter-spacing: 0.5px; }
 
   .chat-close-btn {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 50%;
-    width: 28px; height: 28px;
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 50%; width: 28px; height: 28px;
     display: flex; align-items: center; justify-content: center;
-    color: var(--muted);
-    font-size: 16px;
-    cursor: pointer;
-    line-height: 1;
+    color: var(--muted); font-size: 16px; cursor: pointer; line-height: 1;
   }
 
   .chat-body {
-    flex: 1;
-    overflow-y: auto;
-    padding: 16px 16px 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-    scrollbar-width: none;
+    flex: 1; overflow-y: auto; padding: 16px 16px 8px;
+    display: flex; flex-direction: column; gap: 10px;
+    -webkit-overflow-scrolling: touch; overscroll-behavior: contain; scrollbar-width: none;
   }
   .chat-body::-webkit-scrollbar { display: none; }
 
   .msg {
-    max-width: 86%;
-    padding: 11px 14px;
-    font-family: 'Outfit', sans-serif;
-    font-size: 13.5px;
-    line-height: 1.55;
-    border-radius: 16px;
+    max-width: 86%; padding: 11px 14px;
+    font-family: 'Outfit', sans-serif; font-size: 13.5px; line-height: 1.55; border-radius: 16px;
   }
   .msg.bot {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.07);
-    color: rgba(245,240,232,0.85);
-    align-self: flex-start;
-    border-radius: 4px 16px 16px 16px;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+    color: rgba(245,240,232,0.85); align-self: flex-start; border-radius: 4px 16px 16px 16px;
   }
   .msg.user {
-    background: rgba(200,169,110,0.13);
-    border: 1px solid rgba(200,169,110,0.25);
-    color: var(--text);
-    align-self: flex-end;
-    border-radius: 16px 4px 16px 16px;
+    background: rgba(200,169,110,0.13); border: 1px solid rgba(200,169,110,0.25);
+    color: var(--text); align-self: flex-end; border-radius: 16px 4px 16px 16px;
   }
   .msg.thinking {
-    background: rgba(255,255,255,0.03);
-    color: var(--muted);
-    align-self: flex-start;
-    font-style: italic;
-    font-size: 12px;
-    border-radius: 4px 16px 16px 16px;
+    background: rgba(255,255,255,0.03); color: var(--muted); align-self: flex-start;
+    font-style: italic; font-size: 12px; border-radius: 4px 16px 16px 16px;
   }
 
-  .quick-qs {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 7px;
-    margin-top: 2px;
-  }
+  .quick-qs { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 2px; }
   .quick-q {
-    font-family: 'Outfit', sans-serif;
-    font-size: 11.5px;
-    background: transparent;
-    border: 1px solid rgba(200,169,110,0.25);
-    color: rgba(200,169,110,0.8);
-    padding: 7px 13px;
-    border-radius: 20px;
-    cursor: pointer;
-    text-align: left;
-    transition: background 0.15s;
-    font-weight: 300;
+    font-family: 'Outfit', sans-serif; font-size: 11.5px;
+    background: transparent; border: 1px solid rgba(200,169,110,0.25);
+    color: rgba(200,169,110,0.8); padding: 7px 13px; border-radius: 20px;
+    cursor: pointer; text-align: left; transition: background 0.15s; font-weight: 300;
   }
   .quick-q:active { background: rgba(200,169,110,0.12); }
 
   .chat-input-row {
-    display: flex;
-    gap: 8px;
-    padding: 10px 12px;
+    display: flex; gap: 8px; padding: 10px 12px;
     padding-bottom: calc(10px + var(--safe-bottom));
-    border-top: 1px solid rgba(255,255,255,0.05);
-    flex-shrink: 0;
+    border-top: 1px solid rgba(255,255,255,0.05); flex-shrink: 0;
   }
 
   #chat-input {
-    flex: 1;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(200,169,110,0.2);
-    border-radius: 22px;
-    padding: 10px 16px;
-    font-size: 13.5px;
-    color: var(--text);
-    font-family: 'Outfit', sans-serif;
-    font-weight: 300;
-    outline: none;
-    -webkit-appearance: none;
+    flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(200,169,110,0.2);
+    border-radius: 22px; padding: 10px 16px; font-size: 13.5px;
+    color: var(--text); font-family: 'Outfit', sans-serif; font-weight: 300;
+    outline: none; -webkit-appearance: none;
   }
   #chat-input::placeholder { color: var(--muted); }
 
   #send-btn {
-    width: 40px; height: 40px;
-    background: rgba(200,169,110,0.16);
-    border: 1px solid rgba(200,169,110,0.38);
-    border-radius: 50%;
-    cursor: pointer;
+    width: 40px; height: 40px; background: rgba(200,169,110,0.16);
+    border: 1px solid rgba(200,169,110,0.38); border-radius: 50%; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    color: var(--gold);
-    font-size: 15px;
-    flex-shrink: 0;
-    transition: background 0.15s;
+    color: var(--gold); font-size: 15px; flex-shrink: 0; transition: background 0.15s;
   }
   #send-btn:active { background: rgba(200,169,110,0.3); }
 
-  /* Subtle vignette over viewer */
+  /* Vignette */
   #viewer-wrap::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
+    content: ''; position: absolute; inset: 0; pointer-events: none;
     background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.35) 100%);
     z-index: 5;
+  }
+
+  /* ═══════════════════════════════════════
+     DIRECTIONAL ARROW SYSTEM
+     ── compass-needle layout ──
+     All arrows share one pivot point (#arrow-layer).
+     Each .nav-arrow is an arm: its BOTTOM is pinned to the pivot,
+     its TOP (the arrowhead) points outward in the hotspot direction.
+     The whole arm rotates around transform-origin: 50% 100% (bottom-center).
+  ═══════════════════════════════════════ */
+
+  /* Zero-size pivot, fixed in the floor zone */
+  #arrow-layer {
+    position: absolute;
+    bottom: 32%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    z-index: 20;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  /*
+    Each arm:
+    ─ width=60px, height=90px
+    ─ positioned so its bottom-center sits exactly at the pivot (left:-30px, top:0)
+    ─ rotates around that bottom-center via transform-origin: 50% 100%
+    ─ JS sets: style.transform = "rotate(Xdeg)"  — nothing else ever changes
+  */
+  .nav-arrow {
+    position: absolute;
+    width: 60px;
+    height: 90px;
+    /* box hangs UPWARD from the pivot: bottom-center = layer origin */
+    left: -30px;
+    top: -90px;   /* -height: places the box above the pivot point */
+    transform-origin: 50% 100%;  /* pivot = bottom-center of this box */
+    /* JS writes transform: rotate(Xdeg) — NO other transform here */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; /* arrowhead at top, label below */
+    gap: 4px;
+    pointer-events: all;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+
+  /* The SVG arrowhead — sits at the top of the arm */
+  .arrow-svg {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    display: block;
+    filter: drop-shadow(0 2px 5px rgba(0,0,0,0.7));
+    transition: filter 0.18s ease;
+  }
+
+  /* Label counter-rotates via JS so it stays upright */
+  .arrow-label {
+    font-family: 'Outfit', sans-serif;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    text-align: center;
+    line-height: 1;
+    pointer-events: none;
+    text-shadow: 0 1px 6px rgba(0,0,0,1), 0 0 4px rgba(0,0,0,1);
+    transition: color 0.2s ease, opacity 0.2s ease;
+    /* transform set by JS to counter-rotate */
+    transform-origin: center center;
+  }
+
+  /* ── States ── */
+
+  /* In view: gold, interactive */
+  .nav-arrow.in-view .arrow-svg {
+    filter: drop-shadow(0 2px 8px rgba(200,169,110,0.55));
+  }
+  .nav-arrow.in-view .arrow-label {
+    color: #e8d49a;
+    opacity: 1;
+  }
+
+  /* Out of view: greyscale, no pointer events */
+  .nav-arrow.out-of-view {
+    cursor: default;
+    pointer-events: none;
+  }
+  .nav-arrow.out-of-view .arrow-svg {
+    filter: saturate(0) brightness(0.5) drop-shadow(0 1px 3px rgba(0,0,0,0.4));
+  }
+  .nav-arrow.out-of-view .arrow-label {
+    color: rgba(160,160,160,0.5);
+    opacity: 0.6;
+  }
+
+  /* Hover (in-view only) */
+  .nav-arrow.in-view:hover .arrow-svg {
+    filter: drop-shadow(0 0 14px rgba(200,169,110,0.9)) brightness(1.15);
+  }
+  .nav-arrow.in-view:active .arrow-svg {
+    filter: drop-shadow(0 0 6px rgba(200,169,110,0.5)) brightness(0.85);
+  }
+
+  /* Facing: directly pointing at hotspot */
+  .nav-arrow.facing.in-view .arrow-svg {
+    filter: drop-shadow(0 0 16px rgba(200,169,110,1)) brightness(1.25);
+  }
+  .nav-arrow.facing.in-view .arrow-label {
+    color: #f6e9b8;
   }
 </style>
 </head>
@@ -592,6 +509,12 @@
     </div>
   </div>
 
+  <!-- ── DIRECTIONAL ARROW LAYER ──
+       Arrows are injected here by JS.
+       This sits ABOVE the viewer but BELOW the bottom UI.
+  ── -->
+  <div id="arrow-layer"></div>
+
   <!-- ── TOP BAR ── -->
   <div id="top-bar">
     <div class="logo-block">
@@ -604,7 +527,7 @@
     </div>
   </div>
 
-  <!-- ── SCENE NAME (brief show on switch) ── -->
+  <!-- ── SCENE NAME ── -->
   <div id="scene-pill">
     <div class="scene-pill-group" id="scene-group-display">Exterior</div>
     <div class="scene-pill-name" id="scene-name-display">Exterior 1</div>
@@ -612,7 +535,6 @@
 
   <!-- ── BOTTOM UI ── -->
   <div id="bottom-ui">
-    <!-- Quick actions -->
     <div id="quick-actions">
       <div class="action-chip" onclick="openChatWithQ('Send an inquiry')"><span class="chip-icon">✦</span> Send inquiry</div>
       <div class="action-chip" onclick="openChatWithQ('Tell me about the location and amenities')"><span class="chip-icon">◎</span> Location & amenities</div>
@@ -620,10 +542,8 @@
       <div class="action-chip" onclick="openChatWithQ('What are the pricing and leasing details?')"><span class="chip-icon">◇</span> Pricing</div>
     </div>
 
-    <!-- Scene nav pills -->
     <div id="scene-nav" role="list" aria-label="Scenes"></div>
 
-    <!-- Chat input bar -->
     <div id="chat-bar" onclick="openChat()">
       <span id="chat-bar-text">Ask about this property…</span>
       <div class="bar-action-btn">🎤</div>
@@ -765,65 +685,28 @@ const SCENES = [
   },
 ];
 
-
 // ═══════════════════════════════════════════
 // Q&A DATABASE
 // ═══════════════════════════════════════════
 const QA = [
-  {
-    keys: ["brand","brands","store","stores","shop","shops","tenant","tenants","retail","fashion","label"],
-    ans: "The Collection hosts over 40 premium fashion brands across two floors — a curated mix of international labels and Indian designers focused on contemporary luxury, occasion wear, and lifestyle."
-  },
-  {
-    keys: ["location","located","address","where","find","kalyani","pune","nagar","directions","how to reach"],
-    ans: "The Collection is at New Kalyani Nagar, Pune — easily accessible from Viman Nagar, Kharadi, and Pune Airport."
-  },
-  {
-    keys: ["parking","park","car","vehicle","valet"],
-    ans: "Yes — basement parking for 200+ vehicles, with valet available on weekends and special events."
-  },
-  {
-    keys: ["size","sizes","area","sq ft","sqft","square","space","unit","floor plate"],
-    ans: "Shop sizes range from 300 sq ft boutique units up to 3,000+ sq ft anchor stores, designed for maximum visibility and footfall."
-  },
-  {
-    keys: ["book","booking","rent","lease","available","contact","enquire","enquiry","interest","inquiry","send"],
-    ans: "To enquire about leasing, email leasing@thecollectionpune.com or call +91 20 XXXX XXXX. Our team responds within 24 hours."
-  },
-  {
-    keys: ["price","pricing","cost","rate","rent","how much","per sq ft"],
-    ans: "Ground-floor units start at ₹350/sq ft/month. Contact our leasing team for a tailored commercial proposal."
-  },
-  {
-    keys: ["open","timing","hours","time","when","operating","close"],
-    ans: "Open daily 11:00 AM – 9:30 PM, with extended hours during festive seasons."
-  },
-  {
-    keys: ["amenity","amenities","facilities","atm","food","restaurant","cafe","lounge","wifi"],
-    ans: "Amenities include curated F&B, a luxury lounge, valet parking, high-speed Wi-Fi, dedicated fitting suites, and concierge services."
-  },
-  {
-    keys: ["floor","floors","level","basement","ground","upper","storey"],
-    ans: "Four floors: Basement (parking), Ground Floor (flagship brands & F&B), First Floor (fashion & accessories), Second Floor (lifestyle, décor & events)."
-  },
-  {
-    keys: ["opening","launch","when open","upcoming","new"],
-    ans: "The Collection is in its final construction phase, launching early 2025. Pre-leasing is currently underway."
-  },
-  {
-    keys: ["tour","virtual","360","navigate","how to","view","look around"],
-    ans: "Drag or swipe to look around. Tap the glowing arrow hotspots to move between spaces. Use the pill buttons at the bottom to jump to any scene."
-  },
-  {
-    keys: ["developer","builder","promoter","owner","who built","developed by"],
-    ans: "Developed by a Pune-based premium real estate group with a portfolio of landmark commercial properties across Maharashtra."
-  },
+  { keys: ["brand","brands","store","stores","shop","shops","tenant","tenants","retail","fashion","label"], ans: "The Collection hosts over 40 premium fashion brands across two floors — a curated mix of international labels and Indian designers focused on contemporary luxury, occasion wear, and lifestyle." },
+  { keys: ["location","located","address","where","find","kalyani","pune","nagar","directions","how to reach"], ans: "The Collection is at New Kalyani Nagar, Pune — easily accessible from Viman Nagar, Kharadi, and Pune Airport." },
+  { keys: ["parking","park","car","vehicle","valet"], ans: "Yes — basement parking for 200+ vehicles, with valet available on weekends and special events." },
+  { keys: ["size","sizes","area","sq ft","sqft","square","space","unit","floor plate"], ans: "Shop sizes range from 300 sq ft boutique units up to 3,000+ sq ft anchor stores, designed for maximum visibility and footfall." },
+  { keys: ["book","booking","rent","lease","available","contact","enquire","enquiry","interest","inquiry","send"], ans: "To enquire about leasing, email leasing@thecollectionpune.com or call +91 20 XXXX XXXX. Our team responds within 24 hours." },
+  { keys: ["price","pricing","cost","rate","rent","how much","per sq ft"], ans: "Ground-floor units start at ₹350/sq ft/month. Contact our leasing team for a tailored commercial proposal." },
+  { keys: ["open","timing","hours","time","when","operating","close"], ans: "Open daily 11:00 AM – 9:30 PM, with extended hours during festive seasons." },
+  { keys: ["amenity","amenities","facilities","atm","food","restaurant","cafe","lounge","wifi"], ans: "Amenities include curated F&B, a luxury lounge, valet parking, high-speed Wi-Fi, dedicated fitting suites, and concierge services." },
+  { keys: ["floor","floors","level","basement","ground","upper","storey"], ans: "Four floors: Basement (parking), Ground Floor (flagship brands & F&B), First Floor (fashion & accessories), Second Floor (lifestyle, décor & events)." },
+  { keys: ["opening","launch","when open","upcoming","new"], ans: "The Collection is in its final construction phase, launching early 2025. Pre-leasing is currently underway." },
+  { keys: ["tour","virtual","360","navigate","how to","view","look around"], ans: "Drag or swipe to look around. Tap the glowing arrow hotspots to move between spaces. Use the pill buttons at the bottom to jump to any scene." },
+  { keys: ["developer","builder","promoter","owner","who built","developed by"], ans: "Developed by a Pune-based premium real estate group with a portfolio of landmark commercial properties across Maharashtra." },
 ];
 
 const FALLBACK = "I can only answer questions about The Collection — its location, brands, amenities, pricing, and leasing. Try rephrasing around one of those topics.";
 
 // ═══════════════════════════════════════════
-// PANNELLUM VIEWER + PROGRESSIVE LOADING
+// PANNELLUM VIEWER
 // ═══════════════════════════════════════════
 let currentScene = null;
 let activeId = 'a';
@@ -842,7 +725,6 @@ function buildHotspots(scene) {
     yaw: h.yaw,
     sceneId: h.target,
     text: h.text,
-    // Store target on the element so touch delegate can read it without text matching
     createTooltipFunc: (hotSpotDiv) => {
       hotSpotDiv.setAttribute('data-scene-id', h.target);
     },
@@ -850,9 +732,6 @@ function buildHotspots(scene) {
   }));
 }
 
-// Mobile touch fix: delegate touchend on the active pano container.
-// pannellum's clickHandlerFunc doesn't fire on mobile; we detect a tap
-// on any .pnlm-hotspot element and fire goToScene via its sceneId attribute.
 function bindHotspotTouch(containerId) {
   const el = panoEl(containerId);
   if (el._hotspotDelegated) return;
@@ -864,12 +743,9 @@ function bindHotspotTouch(containerId) {
     if (touchMoved) return;
     const hs = e.target.closest('.pnlm-hotspot');
     if (!hs) return;
-    e.preventDefault();
-    e.stopPropagation();
-    // pannellum stores sceneId as a data attribute on the hotspot element
+    e.preventDefault(); e.stopPropagation();
     const sceneId = hs.getAttribute('data-scene-id') || hs.dataset.sceneId;
     if (sceneId) { goToScene(sceneId); return; }
-    // fallback: match by tooltip text
     const tip = hs.querySelector('.pnlm-tooltip span');
     if (tip) {
       const match = SCENES.find(s => tip.textContent.trim() === s.name);
@@ -884,8 +760,7 @@ function showOverlay(show) {
 
 function setQualityBadge(label) {
   const b = document.getElementById('quality-badge');
-  b.textContent = label;
-  b.style.opacity = '1';
+  b.textContent = label; b.style.opacity = '1';
 }
 
 function showScenePill(scene) {
@@ -897,7 +772,6 @@ function showScenePill(scene) {
   scenePillTimer = setTimeout(() => pill.classList.remove('show'), 2200);
 }
 
-// Detect max WebGL texture size once at startup
 const MAX_TEX = (() => {
   try {
     const c = document.createElement('canvas');
@@ -905,16 +779,6 @@ const MAX_TEX = (() => {
     return gl ? gl.getParameter(gl.MAX_TEXTURE_SIZE) : 4096;
   } catch(e) { return 4096; }
 })();
-
-// Given an image URL, resolve its natural width without adding to DOM
-function getImageWidth(url) {
-  return new Promise(res => {
-    const i = new Image();
-    i.onload = () => res(i.naturalWidth);
-    i.onerror = () => res(0);
-    i.src = url;
-  });
-}
 
 function makeViewer(divId, panorama, opts = {}) {
   const el = panoEl(divId);
@@ -993,8 +857,10 @@ async function loadScene(scene) {
     showOverlay(false);
     setQualityBadge('25%');
     bindHotspotTouch('a');
-    loadQuality(scene, scene.med,  '50%', () =>
-      loadQuality(scene, scene.high, 'HD',  () => {
+    // Build directional arrows for this scene
+    buildArrows(scene);
+    loadQuality(scene, scene.med, '50%', () =>
+      loadQuality(scene, scene.high, 'HD', () => {
         setTimeout(() => { document.getElementById('quality-badge').style.opacity = '0'; }, 2000);
       })
     );
@@ -1006,12 +872,7 @@ function loadQuality(scene, url, label, onDone) {
   if (currentScene?.id !== scene.id) return;
   const img = new Image();
   img.onload = () => {
-    // Skip if image exceeds GPU texture limit — avoids WebGL error
-    if (img.naturalWidth > MAX_TEX) {
-      console.warn(`Skipping ${label}: image ${img.naturalWidth}px > GPU max ${MAX_TEX}px`);
-      onDone();
-      return;
-    }
+    if (img.naturalWidth > MAX_TEX) { onDone(); return; }
     crossfade(scene, url, () => { setQualityBadge(label); onDone(); });
   };
   img.onerror = onDone;
@@ -1024,12 +885,11 @@ function goToScene(id) {
 }
 
 // ═══════════════════════════════════════════
-// SCENE NAV (pill buttons)
+// SCENE NAV
 // ═══════════════════════════════════════════
 function buildNav() {
   const nav = document.getElementById('scene-nav');
   let lastGroup = null;
-
   SCENES.forEach(scene => {
     if (scene.group !== lastGroup) {
       if (lastGroup !== null) {
@@ -1043,7 +903,6 @@ function buildNav() {
       nav.appendChild(label);
       lastGroup = scene.group;
     }
-
     const btn = document.createElement('button');
     btn.className = 'scene-pill-btn';
     btn.dataset.id = scene.id;
@@ -1053,6 +912,127 @@ function buildNav() {
     btn.onclick = () => loadScene(scene);
     nav.appendChild(btn);
   });
+}
+
+// ═══════════════════════════════════════════
+// DIRECTIONAL ARROW SYSTEM — compass pivot
+// ═══════════════════════════════════════════
+
+/*
+  LAYOUT MODEL:
+  ─ #arrow-layer is a zero-size point anchored at the floor center.
+  ─ Each .nav-arrow is an "arm": 60px wide × 90px tall.
+    Its bottom-center is pinned to the pivot (left:-30px, top:0).
+    transform-origin: 50% 100%  →  rotates around its own bottom-center,
+    which is the shared pivot point.
+  ─ JS sets el.style.transform = "rotate(Xdeg)" where X = angleDiff(yaw, hotspot.yaw).
+    This is the ONLY transform ever written to the element.
+  ─ The label counter-rotates by -X so it stays upright regardless of arm angle.
+  ─ In-view / out-of-view determined by FOV check; out-of-view = greyscale + no pointer events.
+  ─ Facing = within ±20° of hotspot direction + in-view → glow.
+*/
+
+let arrowElements = []; // { el, label, hotspot }
+let arrowRafId = null;
+
+function makeArrowSVG() {
+  // Arrow points UP in its natural orientation (12 o'clock = forward).
+  // Solid gold body with subtle 3D bevel + dark shadow for floor legibility.
+  return `<svg class="arrow-svg" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Drop shadow offset shape -->
+  <path d="M20 3 L35 30 L26 26 L26 37 L14 37 L14 26 L5 30 Z"
+        fill="rgba(0,0,0,0.5)" transform="translate(0.6,1.2)"/>
+  <!-- Main body -->
+  <path d="M20 3 L35 30 L26 26 L26 37 L14 37 L14 26 L5 30 Z"
+        fill="#bf9b60"/>
+  <!-- Lighter top face of arrowhead for 3D feel -->
+  <path d="M20 3 L35 30 L26 26 L20 9 L14 26 L5 30 Z"
+        fill="#d4ae72"/>
+  <!-- Highlight sliver -->
+  <path d="M20 8 L30 27 L25 25 Z" fill="rgba(255,255,255,0.13)"/>
+  <!-- Outline -->
+  <path d="M20 3 L35 30 L26 26 L26 37 L14 37 L14 26 L5 30 Z"
+        stroke="rgba(0,0,0,0.5)" stroke-width="1" stroke-linejoin="round" fill="none"/>
+</svg>`;
+}
+
+function buildArrows(scene) {
+  const layer = document.getElementById('arrow-layer');
+  layer.innerHTML = '';
+  arrowElements = [];
+
+  if (arrowRafId) { cancelAnimationFrame(arrowRafId); arrowRafId = null; }
+  if (!scene.hotspots || scene.hotspots.length === 0) return;
+
+  scene.hotspots.forEach((hs) => {
+    const el = document.createElement('div');
+    el.className = 'nav-arrow in-view';
+    // All arms share the same position — they all pivot from the layer origin.
+    // CSS already sets left:-30px, top:-90px, transform-origin:50% 100%.
+    // JS only ever writes el.style.transform = "rotate(Xdeg)".
+
+    el.innerHTML = `${makeArrowSVG()}<div class="arrow-label">${hs.text}</div>`;
+
+    const label = el.querySelector('.arrow-label');
+
+    // Navigate on click/tap (pointer-events disabled when out-of-view via CSS)
+    el.addEventListener('click', (e) => { e.stopPropagation(); goToScene(hs.target); });
+    el.addEventListener('touchend', (e) => {
+      e.preventDefault(); e.stopPropagation(); goToScene(hs.target);
+    }, { passive: false });
+
+    layer.appendChild(el);
+    arrowElements.push({ el, label, hotspot: hs });
+  });
+
+  updateArrows();
+}
+
+// Signed angular difference [-180, 180] — positive = clockwise
+function angleDiff(from, to) {
+  return ((to - from) % 360 + 540) % 360 - 180;
+}
+
+// Pitch → layer opacity: invisible at horizontal, fully visible looking at floor
+function pitchToOpacity(pitch) {
+  if (pitch > 0) return 0;
+  return Math.min(1, (-pitch) / 10) * 0.95;
+}
+
+// Is the hotspot yaw within the viewer's current horizontal FOV?
+function isHotspotInView(yaw, hotspotYaw, hfov) {
+  return Math.abs(angleDiff(yaw, hotspotYaw)) < (hfov / 2) + 10;
+}
+
+function updateArrows() {
+  const av = activeViewer();
+  if (!av) { arrowRafId = requestAnimationFrame(updateArrows); return; }
+
+  let pitch = 0, yaw = 0, hfov = 100;
+  try { pitch = av.getPitch(); yaw = av.getYaw(); hfov = av.getHfov(); } catch(e) {}
+
+  document.getElementById('arrow-layer').style.opacity = pitchToOpacity(pitch);
+
+  arrowElements.forEach(({ el, label, hotspot }) => {
+    const delta = angleDiff(yaw, hotspot.yaw);
+    const absDelta = Math.abs(delta);
+
+    // Rotate the whole arm around its bottom-center (the shared pivot)
+    el.style.transform = `rotate(${delta}deg)`;
+
+    // Counter-rotate the label so it stays horizontal/readable
+    label.style.transform = `rotate(${-delta}deg)`;
+
+    // In-view / out-of-view
+    const inView = isHotspotInView(yaw, hotspot.yaw, hfov);
+    el.classList.toggle('in-view', inView);
+    el.classList.toggle('out-of-view', !inView);
+
+    // Facing glow
+    el.classList.toggle('facing', inView && absDelta < 20);
+  });
+
+  arrowRafId = requestAnimationFrame(updateArrows);
 }
 
 // ═══════════════════════════════════════════
@@ -1079,7 +1059,6 @@ function closeChat() {
   document.getElementById('chat-input').blur();
 }
 
-// Swipe down to close
 let dragStart = null;
 document.getElementById('chat-drawer').addEventListener('touchstart', e => { dragStart = e.touches[0].clientY; }, { passive: true });
 document.getElementById('chat-drawer').addEventListener('touchmove', e => {
@@ -1127,10 +1106,7 @@ async function respond(query) {
       body: JSON.stringify({
         model: "mistralai/mistral-7b-instruct:free",
         messages: [
-          {
-            role: "system",
-            content: `You are the assistant for "The Collection", a premium retail destination in New Kalyani Nagar, Pune. Only answer questions about this property using this knowledge:\n${QA.map(q => `${q.keys[0]}: ${q.ans}`).join('\n')}\nFor anything unrelated, say: "I can only assist with questions about The Collection." Keep replies to 1-2 sentences.`
-          },
+          { role: "system", content: `You are the assistant for "The Collection", a premium retail destination in New Kalyani Nagar, Pune. Only answer questions about this property using this knowledge:\n${QA.map(q => `${q.keys[0]}: ${q.ans}`).join('\n')}\nFor anything unrelated, say: "I can only assist with questions about The Collection." Keep replies to 1-2 sentences.` },
           { role: "user", content: query }
         ]
       })
@@ -1171,8 +1147,7 @@ function initChat() {
   ['What brands are here?', 'Where is it located?', 'Is parking available?', 'How do I book a space?', 'What are the opening hours?']
     .forEach(q => {
       const btn = document.createElement('button');
-      btn.className = 'quick-q';
-      btn.textContent = q;
+      btn.className = 'quick-q'; btn.textContent = q;
       btn.onclick = () => askQ(q);
       wrap.appendChild(btn);
     });
@@ -1180,75 +1155,42 @@ function initChat() {
 }
 
 // ═══════════════════════════════════════════
-// DEV MODE — coordinate picker
-// Triple-tap the viewer (mobile) or press D (desktop) to toggle.
-// When active, clicking/tapping logs pitch & yaw to console AND
-// shows a floating readout on screen so you can copy hotspot coords.
+// DEV MODE
 // ═══════════════════════════════════════════
 let devMode = false;
-let devTapCount = 0, devTapTimer = null;
 
 const devBadge = document.createElement('div');
-devBadge.id = 'dev-badge';
-devBadge.style.cssText = `
-  position:fixed; top:60px; left:50%; transform:translateX(-50%);
-  background:rgba(255,80,80,0.92); color:#fff;
-  font-family:'Outfit',sans-serif; font-size:11px; letter-spacing:2px;
-  text-transform:uppercase; padding:5px 14px; border-radius:20px;
-  z-index:999; display:none; pointer-events:none;
-  box-shadow:0 2px 10px rgba(0,0,0,0.5);
-`;
+devBadge.style.cssText = `position:fixed;top:60px;left:50%;transform:translateX(-50%);background:rgba(255,80,80,0.92);color:#fff;font-family:'Outfit',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;padding:5px 14px;border-radius:20px;z-index:999;display:none;pointer-events:none;box-shadow:0 2px 10px rgba(0,0,0,0.5);`;
 devBadge.textContent = '⌖ DEV MODE — tap to log coords';
 document.body.appendChild(devBadge);
 
 const devReadout = document.createElement('div');
-devReadout.id = 'dev-readout';
-devReadout.style.cssText = `
-  position:fixed; bottom:160px; left:50%; transform:translateX(-50%);
-  background:rgba(0,0,0,0.88); color:#fff;
-  font-family:'Outfit',sans-serif; font-size:12px; letter-spacing:1px;
-  padding:8px 16px; border-radius:10px; z-index:999;
-  display:none; pointer-events:none; text-align:center;
-  border:1px solid rgba(255,80,80,0.5);
-`;
+devReadout.style.cssText = `position:fixed;bottom:160px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.88);color:#fff;font-family:'Outfit',sans-serif;font-size:12px;letter-spacing:1px;padding:8px 16px;border-radius:10px;z-index:999;display:none;pointer-events:none;text-align:center;border:1px solid rgba(255,80,80,0.5);`;
 document.body.appendChild(devReadout);
 
 function toggleDevMode() {
   devMode = !devMode;
   devBadge.style.display = devMode ? 'block' : 'none';
   devReadout.style.display = 'none';
-  console.log(`%c[DEV] Coordinate picker ${devMode ? 'ON' : 'OFF'}`, 'color:tomato;font-weight:bold');
 }
 
-// Desktop: press D to toggle dev mode
 document.addEventListener('keydown', e => {
   if (e.key === 'd' || e.key === 'D') toggleDevMode();
 });
 
-// Dev mode coordinate picker is desktop-only (triple-tap disabled on mobile)
-
-// Desktop: click to log coord when dev mode is on
 document.getElementById('viewer-wrap').addEventListener('click', e => {
   if (!devMode) return;
-  logCoord(e.clientX, e.clientY);
-});
-
-function logCoord(clientX, clientY) {
   const av = activeViewer();
   if (!av) return;
   try {
-    const coords = av.mouseEventToCoords({ clientX, clientY });
-    const pitch = coords[0].toFixed(2);
-    const yaw   = coords[1].toFixed(2);
-    const msg = `pitch: ${pitch},  yaw: ${yaw}`;
+    const coords = av.mouseEventToCoords({ clientX: e.clientX, clientY: e.clientY });
+    const msg = `pitch: ${coords[0].toFixed(2)},  yaw: ${coords[1].toFixed(2)}`;
     console.log(`%c[DEV] ${msg}`, 'color:tomato');
     devReadout.textContent = msg;
     devReadout.style.display = 'block';
     setTimeout(() => { devReadout.style.display = 'none'; }, 3000);
-  } catch(err) {
-    console.warn('[DEV] Could not read coords:', err);
-  }
-}
+  } catch(err) {}
+});
 
 // ═══════════════════════════════════════════
 // INIT
